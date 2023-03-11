@@ -1,8 +1,10 @@
 # Database Access Object wrapper for PHP and PDO in a single class
 
-PdoOne. It's a simple wrapper for PHP's PDO library compatible with SQL Server (2008 R2 or higher), MySQL (5.7 or higher) and Oracle (12.1 or higher).
+PdoOneORM. It's a simple ORM wrapper for PHP's PDO library compatible with SQL Server (2008 R2 or higher),
+MySQL (5.7 or higher) and Oracle (12.1 or higher).
 
-This library tries to **work as fast as possible**. Most of the operations are simple string/array managements and work in the bare metal of the PDO library, but it also allows to create an ORM.
+This library tries to **work as fast as possible and simply as possible**. The complete library, including dependencies
+is less than 100 files (and less than 30 are code)
 
 [![Packagist](https://img.shields.io/packagist/v/eftec/PdoOneORM.svg)](https://packagist.org/packages/eftec/PdoOneORM)
 [![Total Downloads](https://poser.pugx.org/eftec/PdoOne/downloads)](https://packagist.org/packages/eftec/PdoOneORM)
@@ -39,6 +41,7 @@ ProductRepo // this class was generated with echo $pdoOne()->generateCodeClass([
 <!-- TOC -->
 * [Database Access Object wrapper for PHP and PDO in a single class](#database-access-object-wrapper-for-php-and-pdo-in-a-single-class)
 * [Table of contents](#table-of-contents)
+  * [Examples](#examples)
   * [Installation](#installation)
     * [Install (using composer)](#install--using-composer-)
     * [Install (manually)](#install--manually-)
@@ -67,6 +70,14 @@ ProductRepo // this class was generated with echo $pdoOne()->generateCodeClass([
   * [Changelist](#changelist)
   * [License](#license)
 <!-- TOC -->
+
+## Examples
+
+There are some examples in the **examples** folder. If you want to run the examples, then you must change the configuration of the database.
+
+Other example here:
+
+* [getting started](https://southprojects.com/using-orm-in-php-without-a-framework)
 
 ## Installation
 
@@ -111,7 +122,7 @@ $dao->connect();
 $dao=new PdoOneORM("test","anyy","any","any","any","");
 $dao->connect();
 
-// oci (oracle) ez-connect. Remember that you must have installed Oracle Instant client and added to the path.
+// oci (oracle) ez-connect. Remember that you must have installed Oracle Instant client and add it to the path.
 
 $cs='(DESCRIPTION =(ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))(CONNECT_DATA =(SERVER = DEDICATED)(SERVICE_NAME = instancia1)))';
 $dao=new PdoOneORM("oci",$cs,"sa","abc.123"); // oracle uses the user as the schema
