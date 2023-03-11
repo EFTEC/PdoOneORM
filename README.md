@@ -33,7 +33,7 @@ into this using the ORM.
 ```php
 ProductRepo // this class was generated with echo $pdoOne()->generateCodeClass(['Product']); or using the cli.
     ::where("name = ?",[$_POST['name']])
-    ::toList();
+    ->toList();
 ```
 
 # Table of contents
