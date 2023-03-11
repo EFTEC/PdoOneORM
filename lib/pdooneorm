@@ -1,0 +1,39 @@
+<?php
+
+namespace eftec;
+
+function findVendorPath(?string $initPath = null): string
+    {
+        $initPath = $initPath ?: __DIR__;
+        $prefix = '';
+        $defaultvendor = $initPath;
+        // finding vendor
+        for ($i = 0; $i < 8; $i++) {
+            if (@file_exists("$initPath/{$prefix}vendor/autoload.php")) {
+                $defaultvendor = "{$prefix}vendor";
+                break;
+            }
+            $prefix .= '../';
+        }
+        return $defaultvendor;
+    }
+
+    include_once __DIR__ . '/' . findVendorPath() . '/autoload.php';
+
+
+include_once __DIR__ . '/PdoOneORMCli.php';
+// this code only runs on CLI but only if pdooneormcli.php is called directly and via command line.
+if (!defined('PHPUNIT_COMPOSER_INSTALL') && !defined('__PHPUNIT_PHAR__')
+    && isset($_SERVER['PHP_SELF']) &&
+    PdoOneORMCli::isCli() &&
+    (basename($_SERVER['PHP_SELF']) === 'pdooneorm.php' || basename($_SERVER['PHP_SELF']) === 'pdooneorm')
+) {
+    // we also excluded it if it is called by phpunit.
+    $path = PdoOneORMCli::findVendorPath();
+
+
+    $cli = new PdoOneORMCli();
+    /** @noinspection PhpUnhandledExceptionInspection */
+    $cli->cliEngine();
+}
+
