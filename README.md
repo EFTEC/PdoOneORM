@@ -7,7 +7,7 @@ This library tries to **work as fast as possible and simply as possible**. The c
 is less than 100 files (and less than 30 are code)
 
 [![Packagist](https://img.shields.io/packagist/v/eftec/PdoOneORM.svg)](https://packagist.org/packages/eftec/PdoOneORM)
-[![Total Downloads](https://poser.pugx.org/eftec/PdoOne/downloads)](https://packagist.org/packages/eftec/PdoOneORM)
+[![Total Downloads](https://poser.pugx.org/eftec/PdoOneORM/downloads)](https://packagist.org/packages/eftec/PdoOneORM)
 [![Maintenance](https://img.shields.io/maintenance/yes/2023.svg)]()
 [![composer](https://img.shields.io/badge/composer-%3E1.6-blue.svg)]()
 [![php](https://img.shields.io/badge/php-7.1-green.svg)]()
