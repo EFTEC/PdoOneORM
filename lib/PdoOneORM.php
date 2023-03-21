@@ -4,9 +4,20 @@ namespace eftec;
 use Exception;
 use RuntimeException;
 
+
+/**
+ * Class PdoOneORM
+ * It is an extension of the library PdoOneORM to create and manage ORM <br>
+ *
+ * @see           https://github.com/EFTEC/PdoOneORM
+ * @package       eftec
+ * @author        Jorge Castro Castillo
+ * @copyright     Copyright Jorge Castro Castillo 2022-2023. Dual license, commercial and LGPL-3.0
+ * @version       1.01
+ */
 class PdoOneORM extends PdoOne
 {
-    public const VERSION = '1.00';
+    public const VERSION = '1.01';
     /**
      * It generates a new instance of PdoOneORM using an array.
      * @noinspection PhpMissingReturnTypeInspection

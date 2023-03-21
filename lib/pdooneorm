@@ -33,7 +33,6 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL') && !defined('__PHPUNIT_PHAR__')
 
 
     $cli = new PdoOneORMCli();
-    /** @noinspection PhpUnhandledExceptionInspection */
-    $cli->cliEngine();
+
 }
 

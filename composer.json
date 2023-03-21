@@ -30,7 +30,7 @@
     },
     "require": {
         "php": ">=7.2.5",
-        "eftec/pdoone": "^4.0.1",
+        "eftec/pdoone": "^4.1.2",
         "ext-pdo": "*",
         "ext-json": "*"
     },

@@ -562,11 +562,11 @@ abstract class _BasePdoOneRepo
      * <pre>
      * CityRepo::left('country on city.country_id=country.country_id')->toList();
      * </pre>
-     * @param string $sql The join expression.
+     * @param string|null $sql The join expression.
      *
      * @return PdoOneQuery
      */
-    public static function left($sql): PdoOneQuery
+    public static function left(?string $sql): PdoOneQuery
     {
         return static::newQuery()->left($sql);
     }
@@ -577,11 +577,11 @@ abstract class _BasePdoOneRepo
      * <pre>
      * CityRepo::right('country on city.country_id=country.country_id')->toList();
      * </pre>
-     * @param string $sql The join expression.
+     * @param string|null $sql The join expression.
      *
      * @return PdoOneQuery
      */
-    public static function right(string $sql): PdoOneQuery
+    public static function right(?string $sql): PdoOneQuery
     {
         return static::newQuery()->right($sql);
     }

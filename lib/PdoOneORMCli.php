@@ -18,11 +18,11 @@ use RuntimeException;
  * vendor/bin/pdoonecli (Linux/macOS) / vendor/bin/pdoonecli.bat (Windows)
  * </pre>
  *
- * @see           https://github.com/EFTEC/PdoOne
+ * @see           https://github.com/EFTEC/PdoOneORM
  * @package       eftec
  * @author        Jorge Castro Castillo
- * @copyright (c) Jorge Castro C. Dual Licence: MIT and Commercial License  https://github.com/EFTEC/PdoOne
- * @version       1.6.1
+ * @copyright     Copyright Jorge Castro Castillo 2022-2023. Dual license, commercial and LGPL-3.0
+ * @version       1.7
  */
 class PdoOneORMCli extends PdoOneCli
 {
@@ -55,138 +55,69 @@ class PdoOneORMCli extends PdoOneCli
      * @var array
      */
     protected $columnsAlias = [];
-    protected $tablesmarked=[];
+    protected $tablesmarked = [];
+    private $classesSelected;
 
-    public function __construct()
+    public function __construct(bool $run = true)
     {
-        parent::__construct();
+        parent::__construct(false); // PdoOne Menu and init parameters
+        $this->cli->addMenuItem('mainmenu', 'repo', '[{{repo}}] Configure a repository', 'navigate:menuorm');
+        $this->cli->addMenu('menuorm', 'ormheader', 'footer');
+        $this->cli->addMenuItems('menuorm',
+            [
+                'folder' => ['[{{repofolder}}] Configure the repository folder and namespace', 'repofolder'],
+                'scan' => ['[{{reposcan}}] Scan for changes to the database adding or removing tables and columns.', 'reposcan'],
+                'select' => ['Select or de-select the tables to work', 'reposelect'],
+                'detail' => ['Configure each table and columns separately', 'repodetail'],
+                'type' => ['Configure the conversion of the columns per type', 'repotype'],
+                'load' => ['load the configuration', 'repoload'],
+                'save' => ['Save the current configuration', 'reposave'],
+                'create' => ['Create the PHP repository classes', 'repocreate']]
+        );
+        // initialize custom fields:
         $this->conversion = $this->convertReset();
-    }
-
-    public function cliEngine(bool $run=true): void
-    {
-        parent::cliEngine(false); // PdoOne Menu and init parameters
+        // other initializing fields:
         $listPHPFiles = $this->getFiles('.', '.config.php');
         $this->cli->createOrReplaceParam('filerepo', [], 'longflag')
             ->setRequired(false)
             ->setCurrentAsDefault()
             ->setDescription('select a configuration file', 'Select the configuration file to use', [
                     'Example: <dim>"--filerepo myconfig"</dim>']
-                ,'filerepo')
+                , 'filerepo')
             ->setDefault('')
             ->setInput(false, 'string', $listPHPFiles)
             ->evalParam();
-        $this->cli->variables['repofolder']='<red>pending</red>';
-        $this->cli->variables['reposcan']='<red>pending</red>';
-        if($this->cli->getParameter('filerepo')->missing===false) {
+        $this->cli->addVariableCallBack('pdooneorm', function() {
+            // every time we change a variable, then we call this code, so the variable "repo" is always updated
+            if ($this->cli->getVariable('reposcan') !== '<red>pending</red>' &&
+                $this->cli->getVariable('repofolder') !== '<red>pending</red>'
+            ) {
+                $this->cli->setVariable('repo', '<green>ok</green>', false); // false don't want to recall the callback
+            } else {
+                $this->cli->setVariable('repo', '<red>pending</red>', false); // false don't want to recall the callback
+            }
+        });
+        $this->cli->setVariable('repofolder', '<red>pending</red>');
+        $this->cli->setVariable('reposcan', '<red>pending</red>');
+        if ($this->cli->getParameter('filerepo')->missing === false) {
             $this->doReadRepoConfig();
         }
-        $this->mainMenu['repo'] = 'Configure the repository generation';
-        if($run) {
+        if ($run) {
             if ($this->cli->getSTDIN() === null) {
                 $this->showLogo();
             }
-            $this->menuInit();
+            $this->cli->evalMenu('mainmenu', $this);
         }
     }
 
-    protected function showLogo(): void
+    public function menuORMHeader(): void
     {
-        $vorm = PdoOneORM::VERSION;
-        $v = PdoOne::VERSION;
-        $vc = self::VERSION;
-        $this->cli->show("
- ____     _        ___              ___  ____  __  __ 
-|  _ \ __| | ___  / _ \ _ __   ___ / _ \|  _ \|  \/  |
-| |_) / _` |/ _ \| | | | '_ \ / _ \ | | | |_) | |\/| |
-|  __/ (_| | (_) | |_| | | | |  __/ |_| |  _ <| |  | |
-|_|   \__,_|\___/ \___/|_| |_|\___|\___/|_| \_\_|  |_|                                                      
-PdoOneORM:$vorm  PdoOne:$v  Cli $vc  
-
-<yellow>Syntax:php pdooneorm <command> <flags></yellow>
-
-");
-        $this->cli->showParamSyntax2();
-    }
-
-
-    public function convertReset(): array
-    {
-        return ["bigint" => null, "blob" => null, "char" => null, "date" => null, "datetime" => null,
-            "decimal" => null, "double" => null, "enum" => null, "float" => null, "geometry" => null,
-            "int" => null, "json" => null, "longblob" => null, "mediumint" => null, "mediumtext" => null,
-            "set" => null, "smallint" => null, "text" => null, "time" => null, "timestamp" => null,
-            "tinyint" => null, "varbinary" => null, "varchar" => null, "year" => null];
-    }
-
-    /**
-     * Called dynamically
-     * @noinspection PhpUnused
-     */
-    public function menuRepo(): void
-    {
-
-        while (true) {
-            $this->cli->upLevel('repo');
-            $this->cli->setColor(['byellow'])->showBread();
-
-            $menuRepo = $this->cli->createParam('menurepo', [], 'none')
-                ->setRelated(['generate'])
-                ->setArgument('longflag', true)
-                ->setDescription('The command to run when we are generating a new code'
-                    , 'Select a command (empty to exit)'
-                    , ['<cyan><optionkey/></cyan>:<option/>'], 'cmd')
-                ->setAllowEmpty()
-                ->setInput(true, 'wide-option', [
-                    'folder' => '[{{repofolder}}] Configure the repository folder and namespace',
-                    'scan' => '[{{reposcan}}] Scan for changes to the database adding or removing tables and columns.',
-                    'select' => 'Select or de-select the tables to work',
-                    'detail' => 'Configure each table and columns separately',
-                    'type' => 'Configure the conversion of the columns per type',
-                    'load' => 'load the configuration',
-                    'save' => 'Save the current configuration',
-                    'create' => 'Create the PHP repository classes'])
-                ->evalParam(true)->valueKey;
-            if ($menuRepo === $this->cli->emptyValue) {
-                $this->cli->downLevel(2);// one for the same action + other to return to menu
-                return;
-            }
-            $method = 'menuRepo' . $menuRepo;
-            switch ($menuRepo) {
-                case 'save':
-                    $this->menuRepoSave(true);
-                    break;
-                case 'load':
-                    $this->menuRepoLoad();
-                    break;
-                case 'create':
-                    $this->menuRepoCreate();
-                    break;
-                case 'detail':
-                    $this->menuRepoDetail();
-                    break;
-                case 'folder':
-                    $this->menuRepoFolder();
-                    break;
-                case 'scan':
-                    $this->menuRepoScan();
-                    break;
-                case 'select':
-                    $this->menuRepoSelect();
-                    break;
-                case 'type':
-                    $this->menuRepoType();
-                    break;
-
-                default:
-                    $this->$method();
-            }
-            $this->cli->downLevel();
-        }
+        $this->cli->upLevel('orm');
+        $this->cli->setColor(['byellow'])->showBread();
     }
 
     /** @noinspection PhpUnused */
-    protected function menuRepoFolder(): void
+    public function menuRepoFolder(): void
     {
         $this->cli->setParamUsingArray($this->folder);
         $this->cli->createOrReplaceParam('classdirectory')
@@ -263,58 +194,25 @@ PdoOneORM:$vorm  PdoOne:$v  Cli $vc
             }
         } // test namespace
         $this->cli->downLevel();
-        $this->folder = $this->cli->getValueAsArray(['classdirectory','classpostfix','classnamespace']);
-        if(isset($this->folder['classdirectory'])) {
-            $this->cli->variables['repofolder']='<green>ok</green>';
+        $this->folder = $this->cli->getValueAsArray(['classdirectory', 'classpostfix', 'classnamespace']);
+        if (isset($this->folder['classdirectory'])) {
+            $this->cli->setVariable('repofolder', '<green>ok</green>');
         }
     }
-    protected function menuRepoLoad():void
+
+    public function menuRepoLoad(): void
     {
         $this->doReadRepoConfig(true);
     }
-    protected function doReadRepoConfig($input=false):void
+
+    public function menuRepoSave($input = false): void
     {
-        if($input) {
+        if ($input) {
             $this->cli->getParameter('filerepo')->setInput()->evalParam(true);
         } else {
             $this->cli->getParameter('filerepo')->evalParam();
         }
-        $readComplete=$this->cli->readData($this->cli->getValue('filerepo'));
-        if($readComplete[0]===true) {
-            $r = $readComplete[1];
-            $this->conversion = $r['conversion'] ?? [];
-            $this->alias = $r['alias'] ?? [];
-            $this->columnsAlias = $r['columnsAlias'] ?? [];
-            $this->columnsTable = $r['columnsTable'] ?? [];
-            $this->extracolumn = $r['extracolumn'] ?? [];
-            $this->tablexclass = $r['tablexclass'] ?? [];
-            $this->removecolumn = $r['removecolumn'] ?? [];
-            $this->tablesmarked = $r['tablesmarked'] ?? [];
-            $this->folder = $r['folder'] ?? [];
-            if(count($this->columnsTable)>0) {
-                $this->cli->variables['reposcan']='<green>ok</green>';
-            }
-            if(isset($this->folder['classdirectory'])) {
-                $this->cli->variables['repofolder']='<green>ok</green>';
-            }
-            $this->cli->setParamUsingArray($this->folder);
-        } else {
-            $this->cli->showCheck('error', 'red', 'Unable to read configuration, '.
-                $this->cli->getValue('filerepo'));
-        }
-
-    }
-    protected function menuRepoSave($input=false): void
-    {
-        if($input) {
-
-            $this->cli->getParameter('filerepo')->setInput()->evalParam(true);
-
-        } else {
-            $this->cli->getParameter('filerepo')->evalParam();
-        }
-
-        $error=$this->cli->saveData($this->cli->getParameter('filerepo')->value, [
+        $error = $this->cli->saveData($this->cli->getParameter('filerepo')->value, [
             'conversion' => $this->conversion,
             'alias' => $this->alias,
             'columnsAlias' => $this->columnsAlias,
@@ -322,16 +220,16 @@ PdoOneORM:$vorm  PdoOne:$v  Cli $vc
             'extracolumn' => $this->extracolumn,
             'tablexclass' => $this->tablexclass,
             'removecolumn' => $this->removecolumn,
-            'tablesmarked'=>$this->tablesmarked,
+            'tablesmarked' => $this->tablesmarked,
             'folder' => $this->folder]);
-        if(!$error) {
+        if (!$error) {
             $this->cli->showCheck('ok', 'green', 'Configuration saved');
         } else {
-            $this->cli->showCheck('error', 'red', 'Unable to save configuration, '.$error);
+            $this->cli->showCheck('error', 'red', 'Unable to save configuration, ' . $error);
         }
     }
 
-    protected function menuRepoScan(): void
+    public function menuRepoScan(): void
     {
         $pdo = $this->runCliConnection();
         if ($pdo === null) {
@@ -343,7 +241,7 @@ PdoOneORM:$vorm  PdoOne:$v  Cli $vc
             $tables = $pdo->objectList('table', true);
         } catch (Exception $e) {
             $this->cli->showCheck('CRITICAL', 'red', 'Unable to read tables');
-            $this->cli->variables['reposcan']='<green>error</green>';
+            $this->cli->setVariable('reposcan', '<green>error</green>');
             return;
         }
         $tablesmarked = $tables;
@@ -351,14 +249,13 @@ PdoOneORM:$vorm  PdoOne:$v  Cli $vc
             // no values, scanning...
             $this->databaseScan($tablesmarked, $pdo);
         }
-        if(count($this->columnsTable)>0) {
-            $this->cli->variables['reposcan']='<green>ok</green>';
+        if (count($this->columnsTable) > 0) {
+            $this->cli->setVariable('reposcan', '<green>ok</green>');
         }
     }
 
-    protected function menuRepoSelect(): void
+    public function menuRepoSelect(): void
     {
-
         $pdo = $this->runCliConnection();
         if ($pdo === null) {
             $this->cli->showCheck('CRITICAL', 'red', 'No connection');
@@ -371,42 +268,42 @@ PdoOneORM:$vorm  PdoOne:$v  Cli $vc
             $this->cli->showCheck('CRITICAL', 'red', 'Unable to read tables');
             die(1);
         }
-        if($this->tablesmarked===[]) {
+        if ($this->tablesmarked === []) {
             $this->tablesmarked = $allTables;
         }
         $this->cli->upLevel('select');
         $this->cli->setColor(['byellow'])->showBread();
-        $this->cli->setParam('tablesmarked',$this->tablesmarked,false,true);
-        $this->tablesmarked=$this->cli->createParam('tablesmarked')
+        $this->cli->setParam('tablesmarked', $this->tablesmarked, false, true);
+        $this->tablesmarked = $this->cli->createParam('tablesmarked')
             ->setDefault($this->tablesmarked ?? [])
             ->setDescription('', 'Select or de-select a table to process')
             ->setInput(true, 'multiple2', $allTables)
-            ->evalParam(true,true);
+            ->evalParam(true, true);
         $this->cli->downLevel();
     }
 
-    protected function menuRepoDetail(): void
+    public function menuRepoDetail(): void
     {
         $this->cli->upLevel('detail');
         while (true) {
             $this->cli->setColor(['byellow'])->showBread();
-            //$tmp = $this->cli->getValue('tables');
-            $classselected=$this->cli->createOrReplaceParam('classselected',[],'none')
+            $this->classesSelected = $this->cli->createOrReplaceParam('classselected', [], 'none')
                 ->setDescription('', 'Select a table to configure')
                 ->setAllowEmpty()
                 ->setInput(true, 'option3', $this->tablexclass)
                 ->evalParam(true);
+            //$tmp = $this->cli->getValue('tables');
             //$classselected = $this->cli->evalParam('classselected', true);
-            if ($classselected->value === '') {
+            if ($this->classesSelected->value === '') {
                 $this->cli->downLevel();
                 break; // return to command
             }
             //$oldnameclass = $classselected->value;
-            $ktable = $classselected->valueKey;
+            $ktable = $this->classesSelected->valueKey;
             $this->cli->upLevel($ktable, '(table)');
             while (true) { // tablecommand
                 $this->cli->setColor(['byellow'])->showBread();
-                $tablecommand=$this->cli->createOrReplaceParam('tablecommand')
+                $tablecommand = $this->cli->createOrReplaceParam('tablecommand')
                     ->setDescription('', 'Select the command for the table')
                     ->setAllowEmpty()
                     ->setInput(true, 'option', [
@@ -422,194 +319,180 @@ PdoOneORM:$vorm  PdoOne:$v  Cli $vc
                         $this->cli->downLevel();
                         break 2; // while tablecommand
                     case 'rename':
-                        $this->cli->upLevel('rename');
-                        $this->cli->setColor(['byellow'])->showBread();
-                        $newclassname=$this->cli->createOrReplaceParam('newclassname')
-                            ->setDescription('', 'Select the name of the class')
-                            ->setDefault($classselected->value)
-                            ->setInput(true, 'string', [])
-                            ->evalParam(true);
-                        //$k=array_search($classselected->value,$classes,true);
-                        //$classes[$k]=$newclassname->value;
-                        $this->tablexclass[$ktable] = $newclassname->value;
+                        $this->menuRepoDetailRename();
                         $this->cli->downLevel();
                         break;
                     case 'remove':
-                        $this->databaseConfigureRemove($ktable);
+                        $this->menuRepoDetailRemove();
                         break;
                     case 'extracolumn':
-                        $this->cli->upLevel('extracolumn');
-                        while (true) {
-                            $this->cli->setColor(['byellow'])->showBread();
-                            $this->cli->showValuesColumn($this->extracolumn[$ktable], 'option2');
-                            $ecc = $this->cli->createOrReplaceParam('extracolumncommand')
-                                ->setAllowEmpty()
-                                ->setInput(true, 'optionshort', ['add', 'remove'])
-                                ->setDescription('', 'Select an operation')
-                                ->evalParam(true);
-                            switch ($ecc->value) {
-                                case '':
-                                    break 2;
-                                case 'add':
-                                    $tmp = $this->cli->createOrReplaceParam('extracolumn_name')
-                                        //->setAllowEmpty()
-                                        ->setInput()
-                                        ->setDescription('', 'Select a name for the new column')
-                                        ->evalParam(true);
-                                    $tmp2 = $this->cli->createOrReplaceParam('extracolumn_sql')
-                                        //->setAllowEmpty()
-                                        ->setInput()
-                                        ->setDescription('', 'Select a sql for the new column')
-                                        ->evalParam(true);
-                                    $this->extracolumn[$ktable][$tmp->value] = $tmp2->value;
-                                    break;
-                                case 'remove':
-                                    $tmp = $this->cli->createOrReplaceParam('extracolumn_delete')
-                                        ->setAllowEmpty()
-                                        ->setInput(true, 'option2', $this->extracolumn[$ktable])
-                                        ->setDescription('', 'Select a columne to delete')
-                                        ->evalParam(true);
-                                    if ($tmp->valueKey !== $this->cli->emptyValue) {
-                                        unset($this->extracolumn[$ktable][$tmp->valueKey]);
-                                    }
-                                    break;
-                            }
-                        }
+                        $this->menuRepoDetailExtraColumn();
                         $this->cli->downLevel();
                         break;
                     case 'conversion':
-                        $this->cli->upLevel('conversion');
-                        while (true) {
-                            $this->cli->setColor(['byellow'])->showBread();
-                            $tablecolumn=$this->cli->createOrReplaceParam('tablescolumns')
-                                ->setDescription('', 'Select a column (or empty to end)')
-                                ->setAllowEmpty()
-                                ->setInput(true, 'option3', $this->columnsTable[$ktable])
-                                ->evalParam(true);
-                            if ($tablecolumn->value === '') {
-                                // exit
-                                break;
-                            }
-                            $this->cli->upLevel($tablecolumn->valueKey, ' (column)');
-                            $this->cli->setColor(['byellow'])->showBread();
-                            if ($tablecolumn->valueKey[0] === '_') {
-                                $this->cli->createOrReplaceParam('tablescolumnsvalue')
-                                    ->setDescription('', 'Select a relation')
-                                    ->setAllowEmpty()
-                                    ->setRequired(false)
-                                    ->setDefault($tablecolumn->value)
-                                    ->setPattern('<cyan>[{key}]</cyan> {value}')
-                                    ->setInput(true, 'option', [
-                                        'PARENT' => 'The field is related (similar to MANYTONE) but it is not loaded recursively',
-                                        'MANYTOMANY' => 'Many to many relation',
-                                        'ONETOMANY' => 'One to many relation',
-                                        'MANYTOONE' => 'Many to one relation',
-                                        'ONETOONE' => 'One to one'
-                                    ])->add(true);
-                            } else {
-                                $this->cli->createOrReplaceParam('tablescolumnsvalue')
-                                    ->setDescription('', 'Select a conversion')
-                                    ->setDefault($tablecolumn->value)
-                                    ->setAllowEmpty()
-                                    ->setInput(true, 'option', [
-                                        'string' => 'the value is converted to string',
-                                        'encrypt' => 'encrypt the value',
-                                        'decrypt' => 'decrypt the value',
-                                        'datetime3' => 'date/time is convert from human readable to SQL format',
-                                        'datetime4' => 'date/time is not converted',
-                                        'datetime2' => 'date/time is converted from ISO to SQL format',
-                                        'datetime' => 'date/time is converted from a DateTime PHP class to SQL format',
-                                        'timestamp' => 'date/time is converted from timestamp to SQL format',
-                                        'bool' => 'the value will be converted into a boolean (0=false,other=true)',
-                                        'int' => 'the value will be converted into a int',
-                                        'float' => 'the value will be converted into a float',
-                                        'decimal' => 'the value will be converted into a float',
-                                        'null' => 'pending.',
-                                        'nothing' => "it does nothing"])->add(true);
-                            }
-                            $tablecolumnsvalue = $this->cli->evalParam('tablescolumnsvalue', true);
-                            if ($tablecolumnsvalue->valueKey !== $this->cli->emptyValue) {
-                                $this->columnsTable[$ktable][$tablecolumn->valueKey] = $tablecolumnsvalue->valueKey;
-                            }
-                            $this->cli->downLevel();
-                        }
+                        $this->menuRepoDetailConversion();
                         $this->cli->downLevel();
                         break;
                     case 'alias':
-                        $this->cli->upLevel('alias');
-                        while (true) {
-                            $this->cli->setColor(['byellow'])->showBread();
-                            $tablecolumn=$this->cli->createOrReplaceParam('tablescolumns')
-                                ->setDescription('', 'Select a column (or empty to end)')
-                                ->setAllowEmpty()
-                                ->setInput(true, 'option3', $this->columnsAlias[$ktable])
-                                ->evalParam(true);
-                            //$tablecolumn = $this->cli->evalParam('tablescolumns', true);
-                            if ($tablecolumn->value === '') {
-                                // exit
-                                break;
-                            }
-                            $this->cli->upLevel($tablecolumn->valueKey, ' (column)');
-                            $this->cli->setColor(['byellow'])->showBread();
-                            $tablescolumnalias=$this->cli->createOrReplaceParam('tablescolumnsalias')
-                                ->setDescription('', 'Select the new alias of the column. Use: PROPERCASE to set propercase')
-                                ->setAllowEmpty()
-                                ->setInput(true, 'string', [])
-                                ->setDefault($tablecolumn->value)
-                                ->evalParam(true);
-                            $this->columnsAlias[$ktable][$tablecolumn->valueKey] = $tablescolumnalias->value;
-                            $this->cli->downLevel();
-                        }
+                        $this->menuRepoDetailAlias();
                         $this->cli->downLevel();
                         break;
                 }
             } // end while tablecommand
         } // end while table
     }
-    protected function databaseConfigureRemove($ktable): void
+
+    public function menuRepoDetailRename(): void
     {
-        $this->cli->upLevel('remove');
-        $this->removecolumn[$ktable]=$this->removecolumn[$ktable]??[];
+        $this->cli->upLevel('rename');
+        $this->cli->setColor(['byellow'])->showBread();
+        $newclassname = $this->cli->createOrReplaceParam('newclassname')
+            ->setDescription('', 'Select the name of the class')
+            ->setDefault($this->classesSelected->value)
+            ->setInput(true, 'string', [])
+            ->evalParam(true);
+        //$k=array_search($classselected->value,$classes,true);
+        //$classes[$k]=$newclassname->value;
+        $this->tablexclass[$this->classesSelected->valueKey] = $newclassname->value;
+    }
+
+    public function menuRepoDetailRemove(): void
+    {
+        $this->databaseConfigureRemove($this->classesSelected->valueKey);
+    }
+
+    public function menuRepoDetailExtraColumn(): void
+    {
+        $ktable = $this->classesSelected->valueKey;
+        $this->cli->upLevel('extracolumn');
         while (true) {
             $this->cli->setColor(['byellow'])->showBread();
-            if (isset($this->removecolumn[$ktable])) {
-                $this->cli->showValuesColumn($this->removecolumn[$ktable], 'option3');
-            }
+            $this->cli->showValuesColumn($this->extracolumn[$ktable], 'option2');
             $ecc = $this->cli->createOrReplaceParam('extracolumncommand')
                 ->setAllowEmpty()
                 ->setInput(true, 'optionshort', ['add', 'remove'])
-                ->setDescription('', 'Do you want to add or remove a column from the remove-list')
+                ->setDescription('', 'Select an operation')
                 ->evalParam(true);
             switch ($ecc->value) {
                 case '':
                     break 2;
                 case 'add':
-                    $tmp = $this->cli->createParam('extracolumn_name')
+                    $tmp = $this->cli->createOrReplaceParam('extracolumn_name')
                         //->setAllowEmpty()
-                        ->setInput(true, 'option3', array_keys($this->columnsTable[$ktable]))
-                        ->setDescription('', 'Select a name of the column to remove')
+                        ->setInput()
+                        ->setDescription('', 'Select a name for the new column')
                         ->evalParam(true);
-                    $this->removecolumn[$ktable][] = $tmp->value;
+                    $tmp2 = $this->cli->createOrReplaceParam('extracolumn_sql')
+                        //->setAllowEmpty()
+                        ->setInput()
+                        ->setDescription('', 'Select a sql for the new column')
+                        ->evalParam(true);
+                    $this->extracolumn[$ktable][$tmp->value] = $tmp2->value;
                     break;
                 case 'remove':
-                    $tmp = $this->cli->createParam('extracolumn_delete')
+                    $tmp = $this->cli->createOrReplaceParam('extracolumn_delete')
                         ->setAllowEmpty()
-                        ->setInput(true, 'option2', $this->removecolumn[$ktable])
+                        ->setInput(true, 'option2', $this->extracolumn[$ktable])
                         ->setDescription('', 'Select a columne to delete')
                         ->evalParam(true);
                     if ($tmp->valueKey !== $this->cli->emptyValue) {
-                        unset($this->removecolumn[$ktable][$tmp->valueKey - 1]);
+                        unset($this->extracolumn[$ktable][$tmp->valueKey]);
                     }
-                    // renumerate
-                    $this->removecolumn[$ktable] = array_values($this->removecolumn[$ktable]);
                     break;
             }
         }
-        $this->cli->downLevel();
     }
 
+    public function menuRepoDetailConversion(): void
+    {
+        $ktable = $this->classesSelected->valueKey;
+        $this->cli->upLevel('conversion');
+        while (true) {
+            $this->cli->setColor(['byellow'])->showBread();
+            $tablecolumn = $this->cli->createOrReplaceParam('tablescolumns')
+                ->setDescription('', 'Select a column (or empty to end)')
+                ->setAllowEmpty()
+                ->setInput(true, 'option3', $this->columnsTable[$ktable])
+                ->evalParam(true);
+            if ($tablecolumn->value === '') {
+                // exit
+                break;
+            }
+            $this->cli->upLevel($tablecolumn->valueKey, ' (column)');
+            $this->cli->setColor(['byellow'])->showBread();
+            if ($tablecolumn->valueKey[0] === '_') {
+                $this->cli->createOrReplaceParam('tablescolumnsvalue')
+                    ->setDescription('', 'Select a relation')
+                    ->setAllowEmpty()
+                    ->setRequired(false)
+                    ->setDefault($tablecolumn->value)
+                    ->setPattern('<cyan>[{key}]</cyan> {value}')
+                    ->setInput(true, 'option', [
+                        'PARENT' => 'The field is related (similar to MANYTONE) but it is not loaded recursively',
+                        'MANYTOMANY' => 'Many to many relation',
+                        'ONETOMANY' => 'One to many relation',
+                        'MANYTOONE' => 'Many to one relation',
+                        'ONETOONE' => 'One to one'
+                    ])->add(true);
+            } else {
+                $this->cli->createOrReplaceParam('tablescolumnsvalue')
+                    ->setDescription('', 'Select a conversion')
+                    ->setDefault($tablecolumn->value)
+                    ->setAllowEmpty()
+                    ->setInput(true, 'option', [
+                        'string' => 'the value is converted to string',
+                        'encrypt' => 'encrypt the value',
+                        'decrypt' => 'decrypt the value',
+                        'datetime3' => 'date/time is convert from human readable to SQL format',
+                        'datetime4' => 'date/time is not converted',
+                        'datetime2' => 'date/time is converted from ISO to SQL format',
+                        'datetime' => 'date/time is converted from a DateTime PHP class to SQL format',
+                        'timestamp' => 'date/time is converted from timestamp to SQL format',
+                        'bool' => 'the value will be converted into a boolean (0=false,other=true)',
+                        'int' => 'the value will be converted into a int',
+                        'float' => 'the value will be converted into a float',
+                        'decimal' => 'the value will be converted into a float',
+                        'null' => 'pending.',
+                        'nothing' => "it does nothing"])->add(true);
+            }
+            $tablecolumnsvalue = $this->cli->evalParam('tablescolumnsvalue', true);
+            if ($tablecolumnsvalue->valueKey !== $this->cli->emptyValue) {
+                $this->columnsTable[$ktable][$tablecolumn->valueKey] = $tablecolumnsvalue->valueKey;
+            }
+            $this->cli->downLevel();
+        }
+    }
 
-    protected function menuRepoType(): void
+    public function menuRepoDetailAlias(): void
+    {
+        $ktable = $this->classesSelected->valueKey;
+        $this->cli->upLevel('alias');
+        while (true) {
+            $this->cli->setColor(['byellow'])->showBread();
+            $tablecolumn = $this->cli->createOrReplaceParam('tablescolumns')
+                ->setDescription('', 'Select a column (or empty to end)')
+                ->setAllowEmpty()
+                ->setInput(true, 'option3', $this->columnsAlias[$ktable])
+                ->evalParam(true);
+            //$tablecolumn = $this->cli->evalParam('tablescolumns', true);
+            if ($tablecolumn->value === '') {
+                // exit
+                break;
+            }
+            $this->cli->upLevel($tablecolumn->valueKey, ' (column)');
+            $this->cli->setColor(['byellow'])->showBread();
+            $tablescolumnalias = $this->cli->createOrReplaceParam('tablescolumnsalias')
+                ->setDescription('', 'Select the new alias of the column. Use: PROPERCASE to set propercase')
+                ->setAllowEmpty()
+                ->setInput(true, 'string', [])
+                ->setDefault($tablecolumn->value)
+                ->evalParam(true);
+            $this->columnsAlias[$ktable][$tablecolumn->valueKey] = $tablescolumnalias->value;
+            $this->cli->downLevel();
+        }
+    }
+
+    public function menuRepoType(): void
     {
         $this->cli->upLevel('Configure x type');
         while (true) {
@@ -653,29 +536,7 @@ PdoOneORM:$vorm  PdoOne:$v  Cli $vc
         $this->cli->downLevel();
     }
 
-    /** @noinspection ReturnTypeCanBeDeclaredInspection */
-    public function createPdoInstance()
-    {
-        try {
-
-            $pdo = new PdoOneORM(
-                $this->cli->getValue('databaseType'),
-                $this->cli->getValue('server'),
-                $this->cli->getValue('user'),
-                $this->cli->getValue('pwd'),
-                $this->cli->getValue('database'));
-            $pdo->logLevel = 1;
-            $pdo->connect();
-        } catch (Exception $ex) {
-            /** @noinspection PhpUndefinedVariableInspection */
-            $this->cli->showCheck('ERROR', 'red', ['Unable to connect to database', $pdo->lastError(), $pdo->errorText]);
-            return null;
-        }
-        $pdo->logLevel = 2;
-        return $pdo;
-    }
-
-    protected function menuRepoCreate(): void
+    public function menuRepoCreate(): void
     {
         $pdo = $this->runCliConnection();
         if ($pdo === null) {
@@ -712,7 +573,6 @@ PdoOneORM:$vorm  PdoOne:$v  Cli $vc
                 'you must set the directory and namespace',
                 'Use the option <bold><cyan>[folder]</cyan></bold> to set the directory and namespace'], 'stderr');
         }
-
     }
 
     /** @noinspection DisconnectedForeachInstructionInspection */
@@ -813,5 +673,128 @@ PdoOneORM:$vorm  PdoOne:$v  Cli $vc
         if (count($this->extracolumn) === 0) {
             $this->extracolumn = $extracolumn;
         }
+    }
+
+    protected function databaseConfigureRemove($ktable): void
+    {
+        $this->cli->upLevel('remove');
+        $this->removecolumn[$ktable] = $this->removecolumn[$ktable] ?? [];
+        while (true) {
+            $this->cli->setColor(['byellow'])->showBread();
+            if (isset($this->removecolumn[$ktable])) {
+                $this->cli->showValuesColumn($this->removecolumn[$ktable], 'option3');
+            }
+            $ecc = $this->cli->createOrReplaceParam('extracolumncommand')
+                ->setAllowEmpty()
+                ->setInput(true, 'optionshort', ['add', 'remove'])
+                ->setDescription('', 'Do you want to add or remove a column from the remove-list')
+                ->evalParam(true);
+            switch ($ecc->value) {
+                case '':
+                    break 2;
+                case 'add':
+                    $tmp = $this->cli->createParam('extracolumn_name')
+                        //->setAllowEmpty()
+                        ->setInput(true, 'option3', array_keys($this->columnsTable[$ktable]))
+                        ->setDescription('', 'Select a name of the column to remove')
+                        ->evalParam(true);
+                    $this->removecolumn[$ktable][] = $tmp->value;
+                    break;
+                case 'remove':
+                    $tmp = $this->cli->createParam('extracolumn_delete')
+                        ->setAllowEmpty()
+                        ->setInput(true, 'option2', $this->removecolumn[$ktable])
+                        ->setDescription('', 'Select a columne to delete')
+                        ->evalParam(true);
+                    if ($tmp->valueKey !== $this->cli->emptyValue) {
+                        unset($this->removecolumn[$ktable][$tmp->valueKey - 1]);
+                    }
+                    // renumerate
+                    $this->removecolumn[$ktable] = array_values($this->removecolumn[$ktable]);
+                    break;
+            }
+        }
+        $this->cli->downLevel();
+    }
+
+    /** @noinspection ReturnTypeCanBeDeclaredInspection */
+    public function createPdoInstance()
+    {
+        try {
+            $pdo = new PdoOneORM(
+                $this->cli->getValue('databaseType'),
+                $this->cli->getValue('server'),
+                $this->cli->getValue('user'),
+                $this->cli->getValue('pwd'),
+                $this->cli->getValue('database'));
+            $pdo->logLevel = 1;
+            $pdo->connect();
+        } catch (Exception $ex) {
+            /** @noinspection PhpUndefinedVariableInspection */
+            $this->cli->showCheck('ERROR', 'red', ['Unable to connect to database', $pdo->lastError(), $pdo->errorText]);
+            return null;
+        }
+        $pdo->logLevel = 2;
+        return $pdo;
+    }
+
+    protected function doReadRepoConfig($input = false): void
+    {
+        if ($input) {
+            $this->cli->getParameter('filerepo')->setInput()->evalParam(true);
+        } else {
+            $this->cli->getParameter('filerepo')->evalParam();
+        }
+        $readComplete = $this->cli->readData($this->cli->getValue('filerepo'));
+        if ($readComplete[0] === true) {
+            $r = $readComplete[1];
+            $this->conversion = $r['conversion'] ?? [];
+            $this->alias = $r['alias'] ?? [];
+            $this->columnsAlias = $r['columnsAlias'] ?? [];
+            $this->columnsTable = $r['columnsTable'] ?? [];
+            $this->extracolumn = $r['extracolumn'] ?? [];
+            $this->tablexclass = $r['tablexclass'] ?? [];
+            $this->removecolumn = $r['removecolumn'] ?? [];
+            $this->tablesmarked = $r['tablesmarked'] ?? [];
+            $this->folder = $r['folder'] ?? [];
+            if (count($this->columnsTable) > 0) {
+                $this->cli->setVariable('reposcan', '<green>ok</green>');
+            }
+            if (isset($this->folder['classdirectory'])) {
+                $this->cli->setVariable('repofolder', '<green>ok</green>');
+            }
+            $this->cli->setParamUsingArray($this->folder);
+        } else {
+            $this->cli->showCheck('error', 'red', 'Unable to read configuration, ' .
+                $this->cli->getValue('filerepo'));
+        }
+    }
+
+    protected function showLogo(): void
+    {
+        $vorm = PdoOneORM::VERSION;
+        $v = PdoOne::VERSION;
+        $vc = self::VERSION;
+        $this->cli->show("
+ ____     _        ___              ___  ____  __  __ 
+|  _ \ __| | ___  / _ \ _ __   ___ / _ \|  _ \|  \/  |
+| |_) / _` |/ _ \| | | | '_ \ / _ \ | | | |_) | |\/| |
+|  __/ (_| | (_) | |_| | | | |  __/ |_| |  _ <| |  | |
+|_|   \__,_|\___/ \___/|_| |_|\___|\___/|_| \_\_|  |_|                                                      
+PdoOneORM:$vorm  PdoOne:$v  Cli $vc  
+
+<yellow>Syntax:php pdooneorm <command> <flags></yellow>
+
+");
+        $this->cli->showParamSyntax2();
+    }
+
+    public function convertReset(): array
+    {
+        return ["bigint" => null, "blob" => null, "char" => null, "date" => null, "datetime" => null,
+            "decimal" => null, "double" => null, "enum" => null, "float" => null, "geometry" => null,
+            "int" => null, "json" => null, "longblob" => null, "mediumint" => null, "mediumtext" => null,
+            "set" => null, "smallint" => null, "text" => null, "time" => null, "timestamp" => null,
+            "tinyint" => null, "varbinary" => null, "varchar" => null, "year" => null];
     }
 }

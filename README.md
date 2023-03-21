@@ -73,7 +73,7 @@ ProductRepo // this class was generated with echo $pdoOne()->generateCodeClass([
 
 ## Examples
 
-There are some examples in the **examples** folder. If you want to run the examples, then you must change the configuration of the database.
+There are some examples in the **"examples"** folder. If you want to run the examples, then you must change the configuration of the database.
 
 Other example here:
 
@@ -588,6 +588,8 @@ In a nutshell:
 >
 > Every decimal version means that it patches/fixes/refactoring a previous functionality i.e. 1.5.0 -> 1.5.1 (fix)
 
+* 1.1 2023-03-21
+  * [PdoOneORMCli] 1.7 CLI menu updated using the new functionality of the menu from CliOne 1.26.1 
 * 1.0 2023-03-11
   * First version. This version is split from library PdoOne. 
 
