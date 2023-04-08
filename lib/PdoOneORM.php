@@ -13,26 +13,13 @@ use RuntimeException;
  * @package       eftec
  * @author        Jorge Castro Castillo
  * @copyright     Copyright Jorge Castro Castillo 2022-2023. Dual license, commercial and LGPL-3.0
- * @version       1.01
+ * @version       1.2
  */
 class PdoOneORM extends PdoOne
 {
-    public const VERSION = '1.01';
-    /**
-     * It generates a new instance of PdoOneORM using an array.
-     * @noinspection PhpMissingReturnTypeInspection
-     * @noinspection ReturnTypeCanBeDeclaredInspection
-     * @param array $array=['databaseType','server','user','pwd','database'][$i]
-     * @return PdoOneORM
-     */
-    public static function factoryFromArray(array $array)
-    {
-        return new self($array['databaseType'] ?? null,
-            $array['server'] ?? null,
-            $array['user'] ?? null,
-            $array['pwd'] ?? null,
-            $array['database'] ?? null);
-    }
+    protected $phpstart = "<?php\n";
+    public const VERSION = '1.2';
+
     /**
      * @param string $tableName
      * @param string $namespace
@@ -47,7 +34,6 @@ class PdoOneORM extends PdoOne
      * @param array  $resultColumns
      * @return string|string[]
      * @throws Exception
-     * @noinspection PhpUnnecessaryCurlyVarSyntaxInspection
      */
     public function generateAbstractModelClass(
         string $tableName,
@@ -284,7 +270,6 @@ class PdoOneORM extends PdoOne
      *
      * @return string|string[]
      * @throws Exception
-     * @noinspection PhpUnnecessaryCurlyVarSyntaxInspection
      */
     public function generateModelClass(
         string $tableName,

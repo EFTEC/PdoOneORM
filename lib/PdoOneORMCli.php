@@ -22,7 +22,7 @@ use RuntimeException;
  * @package       eftec
  * @author        Jorge Castro Castillo
  * @copyright     Copyright Jorge Castro Castillo 2022-2023. Dual license, commercial and LGPL-3.0
- * @version       1.7
+ * @version       1.8
  */
 class PdoOneORMCli extends PdoOneCli
 {
@@ -212,7 +212,7 @@ class PdoOneORMCli extends PdoOneCli
         } else {
             $this->cli->getParameter('filerepo')->evalParam();
         }
-        $error = $this->cli->saveData($this->cli->getParameter('filerepo')->value, [
+        $error = $this->cli->saveDataPHPFormat($this->cli->getParameter('filerepo')->value, [
             'conversion' => $this->conversion,
             'alias' => $this->alias,
             'columnsAlias' => $this->columnsAlias,
@@ -717,8 +717,8 @@ class PdoOneORMCli extends PdoOneCli
         $this->cli->downLevel();
     }
 
-    /** @noinspection ReturnTypeCanBeDeclaredInspection */
-    public function createPdoInstance()
+
+    public function createPdoInstance(): ?PdoOneORM
     {
         try {
             $pdo = new PdoOneORM(
@@ -745,7 +745,7 @@ class PdoOneORMCli extends PdoOneCli
         } else {
             $this->cli->getParameter('filerepo')->evalParam();
         }
-        $readComplete = $this->cli->readData($this->cli->getValue('filerepo'));
+        $readComplete = $this->cli->readDataPHPFormat($this->cli->getValue('filerepo'));
         if ($readComplete[0] === true) {
             $r = $readComplete[1];
             $this->conversion = $r['conversion'] ?? [];

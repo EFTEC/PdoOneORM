@@ -18,21 +18,21 @@ class Cli_Test extends TestCase
 
     }
     /**
-     * @covers:\eftec\PdoOneORMCli
+     * @covers::\eftec\PdoOneORMCli
      */
     public function testrun():void {
         // it is because phpunit could run elsewhere
         chdir(__DIR__);
         //var_dump(__DIR__);
         CliOne::testUserInput(null);
-        CliOne::testUserInput(['connect','configure','mysql','','root','abc.123','sakila','','repo'
+        CliOne::testUserInput(['connect','configure','mysql','','root','abc.123','sakila','yes','',1,null,'','repo'
             ,'folder','repo','Repo','eftec\\tests\\repo'
             ,'scan'
             ,'save','test','','']);
         $this->cli=new PdoOneORMCli();
         $this->assertFileExists(__DIR__.'/test.config.php');
         unlink(__DIR__.'/test.config.php');
-        $this->assertEquals(true,true); // if reach there then it succeeded
+        $this->assertTrue(true); // if reach there then it succeeded
     }
 
 }

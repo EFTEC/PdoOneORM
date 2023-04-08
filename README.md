@@ -43,8 +43,8 @@ ProductRepo // this class was generated with echo $pdoOne()->generateCodeClass([
 * [Table of contents](#table-of-contents)
   * [Examples](#examples)
   * [Installation](#installation)
-    * [Install (using composer)](#install--using-composer-)
-    * [Install (manually)](#install--manually-)
+    * [Install (using composer)](#install-using-composer)
+    * [Install (manually)](#install-manually)
   * [How to create a Connection?](#how-to-create-a-connection)
     * [OCI](#oci)
   * [ORM](#orm)
@@ -61,12 +61,12 @@ ProductRepo // this class was generated with echo $pdoOne()->generateCodeClass([
     * [DML Database Model Language](#dml-database-model-language)
     * [Validate the model](#validate-the-model)
     * [Recursive](#recursive)
-      * [recursive()](#recursive--)
-      * [getRecursive()](#getrecursive--)
-      * [hasRecursive()](#hasrecursive--)
-  * [Benchmark (mysql, estimated)](#benchmark--mysql-estimated-)
+      * [recursive()](#recursive-1)
+      * [getRecursive()](#getrecursive)
+      * [hasRecursive()](#hasrecursive)
+  * [Benchmark (mysql, estimated)](#benchmark-mysql-estimated)
   * [Error FAQs](#error-faqs)
-    * [Uncaught Error: Undefined constant eftec\_BasePdoOneRepo::COMPILEDVERSION](#uncaught-error--undefined-constant-eftecbasepdoonerepo---compiledversion)
+    * [Uncaught Error: Undefined constant eftec\_BasePdoOneRepo::COMPILEDVERSION](#uncaught-error-undefined-constant-eftecbasepdoonerepocompiledversion)
   * [Changelist](#changelist)
   * [License](#license)
 <!-- TOC -->
@@ -587,7 +587,10 @@ In a nutshell:
 > Every minor version means that it adds a new functionality i.e. 1.5 -> 1.6 (new methods)
 >
 > Every decimal version means that it patches/fixes/refactoring a previous functionality i.e. 1.5.0 -> 1.5.1 (fix)
-
+* 1.2 2023-04-7
+  * [PdoOneORM] update for compatibility with PdoOne 4.2 and higher
+  * [composer.json] PHPUnit reduced to 8.5 (PHP 7.2 compatible)
+  * [PdoOneORMCli] 1.8 now configuration files are stored as PHP file instead of a json. Why? It is more flexible.
 * 1.1 2023-03-21
   * [PdoOneORMCli] 1.7 CLI menu updated using the new functionality of the menu from CliOne 1.26.1 
 * 1.0 2023-03-11
