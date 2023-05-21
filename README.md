@@ -587,6 +587,9 @@ In a nutshell:
 > Every minor version means that it adds a new functionality i.e. 1.5 -> 1.6 (new methods)
 >
 > Every decimal version means that it patches/fixes/refactoring a previous functionality i.e. 1.5.0 -> 1.5.1 (fix)
+
+* 1.2.1 2023-05-21
+  * [PdoOneORMCli] 1.8.1 fixed a small bug in "configure per type" 
 * 1.2 2023-04-7
   * [PdoOneORM] update for compatibility with PdoOne 4.2 and higher
   * [composer.json] PHPUnit reduced to 8.5 (PHP 7.2 compatible)

@@ -22,7 +22,7 @@ use RuntimeException;
  * @package       eftec
  * @author        Jorge Castro Castillo
  * @copyright     Copyright Jorge Castro Castillo 2022-2023. Dual license, commercial and LGPL-3.0
- * @version       1.8
+ * @version       1.8.1
  */
 class PdoOneORMCli extends PdoOneCli
 {
@@ -33,7 +33,11 @@ class PdoOneORMCli extends PdoOneCli
     /**
      * @var array conversion by type
      */
-    protected $conversion = [];
+    protected $conversion = ["bigint" => null, "blob" => null, "char" => null, "date" => null, "datetime" => null,
+        "decimal" => null, "double" => null, "enum" => null, "float" => null, "geometry" => null,
+        "int" => null, "json" => null, "longblob" => null, "mediumint" => null, "mediumtext" => null,
+        "set" => null, "smallint" => null, "text" => null, "time" => null, "timestamp" => null,
+        "tinyint" => null, "varbinary" => null, "varchar" => null, "year" => null];
     protected $folder = [];
     /**
      * @var array
@@ -74,8 +78,6 @@ class PdoOneORMCli extends PdoOneCli
                 'save' => ['Save the current configuration', 'reposave'],
                 'create' => ['Create the PHP repository classes', 'repocreate']]
         );
-        // initialize custom fields:
-        $this->conversion = $this->convertReset();
         // other initializing fields:
         $listPHPFiles = $this->getFiles('.', '.config.php');
         $this->cli->createOrReplaceParam('filerepo', [], 'longflag')
@@ -717,7 +719,6 @@ class PdoOneORMCli extends PdoOneCli
         $this->cli->downLevel();
     }
 
-
     public function createPdoInstance(): ?PdoOneORM
     {
         try {
@@ -787,14 +788,5 @@ PdoOneORM:$vorm  PdoOne:$v  Cli $vc
 
 ");
         $this->cli->showParamSyntax2();
-    }
-
-    public function convertReset(): array
-    {
-        return ["bigint" => null, "blob" => null, "char" => null, "date" => null, "datetime" => null,
-            "decimal" => null, "double" => null, "enum" => null, "float" => null, "geometry" => null,
-            "int" => null, "json" => null, "longblob" => null, "mediumint" => null, "mediumtext" => null,
-            "set" => null, "smallint" => null, "text" => null, "time" => null, "timestamp" => null,
-            "tinyint" => null, "varbinary" => null, "varchar" => null, "year" => null];
     }
 }

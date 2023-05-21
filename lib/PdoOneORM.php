@@ -1,9 +1,9 @@
 <?php /** @noinspection DuplicatedCode */
 
 namespace eftec;
+
 use Exception;
 use RuntimeException;
-
 
 /**
  * Class PdoOneORM
@@ -13,12 +13,12 @@ use RuntimeException;
  * @package       eftec
  * @author        Jorge Castro Castillo
  * @copyright     Copyright Jorge Castro Castillo 2022-2023. Dual license, commercial and LGPL-3.0
- * @version       1.2
+ * @version       1.2.1
  */
 class PdoOneORM extends PdoOne
 {
     protected $phpstart = "<?php\n";
-    public const VERSION = '1.2';
+    public const VERSION = '1.2.1';
 
     /**
      * @param string $tableName
@@ -68,17 +68,17 @@ class PdoOneORM extends PdoOne
         } else {
             $className = $classRelations[$tableName];
         }
-        $r = str_replace(array(
+        $r = str_replace([
             '{version}',
             '{classname}',
             '{exception}',
             '{namespace}'
-        ), array(
+        ], [
             self::VERSION . ' Date generated ' . date('r'), //{version}
             $className, // {classname}
             ($namespace) ? 'use Exception;' : '',
             ($namespace) ? "namespace $namespace;" : ''
-        ), $r);
+        ], $r);
         $pk = '??';
         $pk = $this->service->getPK($tableName, $pk);
         $pkFirst = (is_array($pk) && count($pk) > 0) ? $pk[0] : null;
@@ -223,7 +223,7 @@ class PdoOneORM extends PdoOne
             $noUpdate = $identities;
         }
         try {
-            $r = str_replace(array(
+            $r = str_replace([
                 '{pk}',
                 '{def}',
                 '{defname}',
@@ -234,7 +234,7 @@ class PdoOneORM extends PdoOne
                 '{deffktype}',
                 '{array}',
                 '{array_null}'
-            ), array(
+            ], [
                 self::varExport($pk),
                 //str_replace(["\n\t\t        ", "\n\t\t    ],"], ['', '],'], PdoOne::varExport($gdf, "\t\t")), // {def}
                 self::varExport($gdf, "\t\t"),
@@ -250,7 +250,7 @@ class PdoOneORM extends PdoOne
                 str_replace("\n", "\n\t\t",
                     rtrim($this->generateCodeArray($tableName, null, true, false, true, $classRelations, $relation),
                         "\n"))
-            ), $r);
+            ], $r);
         } catch (Exception $e) {
             $this->endTry();
             return "Unable read definition of tables " . $e->getMessage();
@@ -258,6 +258,7 @@ class PdoOneORM extends PdoOne
         $this->endTry();
         return $r;
     }
+
     /**
      * @param string $tableName
      * @param string $namespace
@@ -300,17 +301,17 @@ class PdoOneORM extends PdoOne
         } else {
             $className = $classRelations[$tableName];
         }
-        $r = str_replace(array(
+        $r = str_replace([
             '{version}',
             '{classname}',
             '{exception}',
             '{namespace}'
-        ), array(
+        ], [
             self::VERSION . ' Date generated ' . date('r'), //{version}
             $className, // {classname}
             ($namespace) ? 'use Exception;' : '',
             ($namespace) ? "namespace $namespace;" : ''
-        ), $r);
+        ], $r);
         $pk = '??';
         $pk = $this->service->getPK($tableName, $pk);
         $pkFirst = (is_array($pk) && count($pk) > 0) ? $pk[0] : null;
@@ -501,7 +502,7 @@ class PdoOneORM extends PdoOne
             $noUpdate = $identities;
         }
         try {
-            $r = str_replace(array(
+            $r = str_replace([
                 '{pk}',
                 '{def}',
                 '{defname}',
@@ -513,7 +514,7 @@ class PdoOneORM extends PdoOne
                 '{deffktype}',
                 '{array}',
                 '{array_null}'
-            ), array(
+            ], [
                 self::varExport($pk),
                 //str_replace(["\n\t\t        ", "\n\t\t    ],"], ['', '],'], PdoOne::varExport($gdf, "\t\t")), // {def}
                 self::varExport($gdf, "\t\t"),
@@ -530,7 +531,7 @@ class PdoOneORM extends PdoOne
                 str_replace("\n", "\n\t\t",
                     rtrim($this->generateCodeArray($tableName, null, true, false, true, $classRelations, $relation),
                         "\n"))
-            ), $r);
+            ], $r);
         } catch (Exception $e) {
             $this->endTry();
             return "Unable read definition of tables " . $e->getMessage();
@@ -538,6 +539,7 @@ class PdoOneORM extends PdoOne
         $this->endTry();
         return $r;
     }
+
     /**
      * It generates a class<br>
      * <b>Example:</b><br>
@@ -635,7 +637,7 @@ class PdoOneORM extends PdoOne
             $extraColArray .= $v . ' as ' . $this->addQuote($k) . ',';
         }
         $extraColArray = rtrim($extraColArray, ',');
-        $r = str_replace(array(
+        $r = str_replace([
             '{version}',
             '{classname}',
             '{exception}',
@@ -647,7 +649,7 @@ class PdoOneORM extends PdoOne
             '{classmodellist}',
             '{classmodelfirst}',
             '{extracol}'
-        ), array(
+        ], [
             self::VERSION . ' Date generated ' . date('r'), //{version}
             $className, // {classname}
             ($namespace) ? 'use Exception;' : '',
@@ -659,9 +661,9 @@ class PdoOneORM extends PdoOne
             $modelUse ? "$modelClass::fromArrayMultiple( self::_toList(\$filter, \$filterValue));"
                 : 'false; // no model set',  // {classmodellist}
             $modelUse ? "$modelClass::fromArray(self::_first(\$pk));" : 'false; // no model set' // {classmodelfirst}
-        ,
+            ,
             $extraColArray // {extracol}
-        ), $r);
+        ], $r);
         $pk = $this->service->getPK($tableName, '??');
         $pkFirst = (is_array($pk) && count($pk) > 0) ? $pk[0] : null;
         [$relation, $linked] = $this->generateGetRelations($tableName, $columnRelations, $pkFirst, $aliasesAllTables);
@@ -870,7 +872,7 @@ class PdoOneORM extends PdoOne
             $listAlias[$k] = $v['alias'];
         }
         try {
-            $r = str_replace(array(
+            $r = str_replace([
                 '{pk}',
                 '{identity}',
                 '{def}',
@@ -889,7 +891,7 @@ class PdoOneORM extends PdoOne
                 '{factory}',
                 '{factoryrecursive}',
                 '{linked}'
-            ), array(
+            ], [
                 self::varExport($pk),
                 self::varExport($identity), // {identity}
                 //str_replace(["\n\t\t        ", "\n\t\t    ],"], ['', '],'], self::varExport($gdf, "\t\t")), // {def}
@@ -909,10 +911,10 @@ class PdoOneORM extends PdoOne
                     $getDefTable, $classRelations ?? [], $relation, 'function'), "\t\t"), // {array}
                 self::varExport($this->generateCodeArrayConst(
                     $getDefTable, $classRelations ?? [], $relation, 'constant'), "\t\t"), // {factory}
-                str_replace(["\n","\t","    "],"",self::varExport($this->generateCodeArrayRecursive(
+                str_replace(["\n", "\t", "    "], "", self::varExport($this->generateCodeArrayRecursive(
                     $getDefTable, $classRelations ?? [], $relation, 'function'))),// {factoryrecursive}
                 $linked // {linked}
-            ), $r);
+            ], $r);
         } catch (Exception $e) {
             $this->endTry();
             return "Unable read definition of tables " . $e->getMessage();
@@ -920,6 +922,7 @@ class PdoOneORM extends PdoOne
         $this->endTry();
         return $r;
     }
+
     /**
      * It builds (generates source code) of the base, repo and repoext classes of the current schema.<br>
      * <b>Example:</b><br>
@@ -1142,6 +1145,7 @@ class PdoOneORM extends PdoOne
         $this->setUseInternalCache($internalCache);
         return $logs;
     }
+
     public function run(
         string $database,
         string $server,
@@ -1153,7 +1157,7 @@ class PdoOneORM extends PdoOne
         string $namespace
     )
     {
-        $r=parent::run($database,$server,$user,$pwd,$db,$input,$output,$namespace);
+        $r = parent::run($database, $server, $user, $pwd, $db, $input, $output, $namespace);
         switch ($output) {
             case 'createcode':
                 return $this->generateCodeCreate($input);
@@ -1196,6 +1200,7 @@ class PdoOneORM extends PdoOne
             _BasePdoOneRepo::BINARYVERSION, // {compiled}
         ], $r);
     }
+
     public function generateCodeClassRepo(
         $tableName,
         $namespace = '',
@@ -1238,7 +1243,7 @@ class PdoOneORM extends PdoOne
             $helpcolumns .= " * <li><b>$alias</b>: $v[1] (alias of column $v[0]) $c</li>\n";
         }
         $this->endTry();
-        return str_replace(array(
+        return str_replace([
             '{version}',
             '{classname}',
             '{exception}',
@@ -1250,7 +1255,7 @@ class PdoOneORM extends PdoOne
             '{modeluse}',
             '{helpcolumns}',
             '{related}'
-        ), array(
+        ], [
             self::VERSION . ' Date generated ' . date('r'), // {version}
             $classRelations[$tableName], // {class}
             ($namespace) ? 'use Exception;' : '',
@@ -1262,8 +1267,9 @@ class PdoOneORM extends PdoOne
             $modelUse ? 'true' : 'false', // {modeluse},
             rtrim($helpcolumns), // {helpcolumns}
             rtrim($related)
-        ), $r);
+        ], $r);
     }
+
     /**
      * @param string $tableName
      *
@@ -1285,5 +1291,4 @@ class PdoOneORM extends PdoOne
         $this->endTry();
         return $code;
     }
-
 }
