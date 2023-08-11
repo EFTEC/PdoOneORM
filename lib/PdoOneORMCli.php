@@ -1,5 +1,5 @@
-<?php /** @noinspection PhpUnused */
-
+<?php /** @noinspection UnknownInspectionInspection */
+/** @noinspection PhpUnused */
 /** @noinspection DuplicatedCode */
 
 namespace eftec;
@@ -22,7 +22,7 @@ use RuntimeException;
  * @package       eftec
  * @author        Jorge Castro Castillo
  * @copyright     Copyright Jorge Castro Castillo 2022-2023. Dual license, commercial and LGPL-3.0
- * @version       1.8.1
+ * @version       1.8.2
  */
 class PdoOneORMCli extends PdoOneCli
 {
@@ -247,10 +247,9 @@ class PdoOneORMCli extends PdoOneCli
             return;
         }
         $tablesmarked = $tables;
-        if (count($this->tablexclass) === 0) {
-            // no values, scanning...
-            $this->databaseScan($tablesmarked, $pdo);
-        }
+        //if (count($this->tablexclass) === 0) {
+        $this->databaseScan($tablesmarked, $pdo);
+        //}
         if (count($this->columnsTable) > 0) {
             $this->cli->setVariable('reposcan', '<green>ok</green>');
         }

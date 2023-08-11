@@ -1,4 +1,5 @@
-<?php /** @noinspection DuplicatedCode */
+<?php /** @noinspection UnknownInspectionInspection */
+/** @noinspection DuplicatedCode */
 
 namespace eftec;
 
@@ -13,12 +14,12 @@ use RuntimeException;
  * @package       eftec
  * @author        Jorge Castro Castillo
  * @copyright     Copyright Jorge Castro Castillo 2022-2023. Dual license, commercial and LGPL-3.0
- * @version       1.2.1
+ * @version       1.2.2
  */
 class PdoOneORM extends PdoOne
 {
     protected $phpstart = "<?php\n";
-    public const VERSION = '1.2.1';
+    public const VERSION = '1.2.2';
 
     /**
      * @param string $tableName
@@ -127,7 +128,6 @@ class PdoOneORM extends PdoOne
                 }
             }
         }
-        //die(1);
         $gdf = $this->getDefTable($tableName, $specialConversion);
         foreach ($columnRemove as $v) {
             unset($gdf[$v]);
@@ -413,7 +413,6 @@ class PdoOneORM extends PdoOne
                 }
             }
         }
-        //die(1);
         $gdf = $this->getDefTable($tableName, $specialConversion);
         $fields = [];
         $fieldsb = [];
@@ -671,18 +670,12 @@ class PdoOneORM extends PdoOne
             $this->endTry();
             return 'Error: Unable read fk of table ' . $relation;
         }
-        /*  } catch (Exception $e) {
-              $this->endTry();
-              return 'Error: Unable read fk of table ' . $e->getMessage();
-          }*/
-        //die(1);
         $convertOutput = '';
         $convertInput = '';
         $getDefTable = $this->getDefTable($tableName, $specialConversion);
         foreach ($columnRemove as $v) {
             unset($getDefTable[$v]);
         }
-        //die(1);
         // we forced the conversion but only if it is not specified explicit
         $allColumns = array_merge($getDefTable, $extraCols); // $extraColArray does not have type
         foreach ($allColumns as $kcol => $colDef) {
@@ -853,7 +846,6 @@ class PdoOneORM extends PdoOne
                 $noUpdate[] = $v;
             }
         }*/
-        //die(1);
         if ($pk) {
             // we never update the primary key.
             $noUpdate += $pk; // it adds and replaces duplicates, indexes are ignored.
@@ -932,7 +924,7 @@ class PdoOneORM extends PdoOne
      *          'products'=>['ProductRepo','ProductModel']
      *          ,'types'=>['TypeRepo','TypeModel']
      *          ],
-     *          ,'SakilaBase'
+     *          'SakilaBase'
      *          ,['eftec\repo','eftec\model']
      *          ,['c:/temp','c:/tempmodel']
      *          ,false,
@@ -942,18 +934,19 @@ class PdoOneORM extends PdoOne
      *              ,'col1'=>'encrypt' // encrypt (input and output)
      *              ,'col2'=>['encrypt','decrypt'] // encrypt input and decrypt output
      *              ,'col3'=>['encrypt',null] // encrypt input and none output
-     *          ]);
+     *          ]]);
      * // without model
      * $this->generateAllClasses([
      *          'products'=>'ProductRepo'
      *          ,'types'=>'TypeRepo'
-     *          ],
+     *          ]
      *          ,'SakilaBase'
      *          ,'eftec\repo'
      *          ,'c:/temp'
      *          ,false,
      *          ['products'=>['_col'=>'PARENT','_col2'=>'MANYTOMANY'],
-     *          ['products'=>['extracol'=>'now()']);
+     *          ['products'=>['extracol'=>'now()']]
+     *          ]);
      * </pre>
      *
      * @param array        $relations       Where the key is the name of the table, and the value is an array with
@@ -984,7 +977,7 @@ class PdoOneORM extends PdoOne
      *                                      decrypt output<br>
      *                                      <b>Conversion allowed</b> (see generateCodeClassConversions)
      * @param array        $extraColumns    An associative array with extra columns per table. It has the same form
-     *                                      than $columnRelations. The columns are returned when we use toList() and
+     *                                      as $columnRelations. The columns are returned when we use toList() and
      *                                      first() and they are added to the model (if any) but they are not used in
      *                                      insert,update or delete<br>
      * @param array        $columnRemoves   An associative array to skip in the generation with the key as the name of
@@ -1008,6 +1001,8 @@ class PdoOneORM extends PdoOne
         array  $aliases = []
     ): array
     {
+
+
         $internalCache = $this->useInternalCache;
         $this->setUseInternalCache();
         if (is_array($folders)) {

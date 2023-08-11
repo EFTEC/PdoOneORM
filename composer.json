@@ -29,8 +29,8 @@
         }
     },
     "require": {
-        "php": ">=7.2.5",
-        "eftec/pdoone": "^4.2",
+        "php": "^7.2.5 || ^8.0",
+        "eftec/pdoone": "^4.3",
         "ext-pdo": "*",
         "ext-json": "*"
     },

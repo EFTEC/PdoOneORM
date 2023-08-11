@@ -410,7 +410,7 @@ The nested operators are methods that should be in between of our chain of metho
 
 > ClassRepo::op()::where()::finalop() is ✅
 >
-> ClassRepo::op()::op()::where() will left the chain open ❌
+> ClassRepo::op()::op()::where() will leave the chain open ❌
 
 For example:
 
@@ -588,6 +588,9 @@ In a nutshell:
 >
 > Every decimal version means that it patches/fixes/refactoring a previous functionality i.e. 1.5.0 -> 1.5.1 (fix)
 
+* 1.2.2 2023-08-11
+  * [PdoOneORMCli] 1.8.2 fixed a bug not scanning.
+  * Update dependencies to eftec/pdoone 4.3
 * 1.2.1 2023-05-21
   * [PdoOneORMCli] 1.8.1 fixed a small bug in "configure per type" 
 * 1.2 2023-04-7
