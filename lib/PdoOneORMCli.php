@@ -22,7 +22,7 @@ use RuntimeException;
  * @package       eftec
  * @author        Jorge Castro Castillo
  * @copyright     Copyright Jorge Castro Castillo 2022-2023. Dual license, commercial and LGPL-3.0
- * @version       1.8.2
+ * @version       1.9
  */
 class PdoOneORMCli extends PdoOneCli
 {
@@ -552,6 +552,7 @@ class PdoOneORMCli extends PdoOneCli
                     , ['Values available <cyan><option/></cyan>'], 'bool')
                 ->setInput(true, 'optionshort', ['yes', 'no'])->evalParam(true);
             //$this->cli->evalParam('overridegenerate', true);
+            $this->cli->showLine('<blue>Generating PHP files, please wait.</blue>');
             $pdo->generateCodeClassConversions($this->conversion);
             $tmpTableXClass = [];
             foreach ($this->tablexclass as $k => $v) {
@@ -579,6 +580,10 @@ class PdoOneORMCli extends PdoOneCli
     /** @noinspection DisconnectedForeachInstructionInspection */
     protected function databaseScan($tablesmarked, $pdo): void
     {
+        /*$tmptablexclass=$this->tablexclass;
+        $tmpcolumnsTable=$this->columnsTable;
+        $tmpextracolumn=$this->extracolumn;
+        $tmpcolumnsAlias=$this->columnsAlias;*/
         $tablexclass = [];
         $columnsTable = [];
         $conversion = [];
@@ -587,9 +592,11 @@ class PdoOneORMCli extends PdoOneCli
         $def2 = [];
         $pk = [];
         $this->cli->show('<yellow>Please wait, reading structure of tables... </yellow>');
-        $this->cli->showWaitCursor();
+        $this->cli->hideCursor()->showWaitCursor();
+
         foreach ($tablesmarked as $table) {
             $this->cli->showWaitCursor(false);
+
             $class = PdoOne::tableCase($table);
             //$classes[] = $class;
             $tablexclass[$table] = $class;
@@ -611,6 +618,7 @@ class PdoOneORMCli extends PdoOneCli
                 }
             }
         }
+        $this->cli->hideWaitCursor()->showCursor();
         // The next lines are used for testing:
         //unset($tablexclass['actor']);
         //$tablexclass['newtable']='newtablerepo';

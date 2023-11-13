@@ -30,7 +30,8 @@
     },
     "require": {
         "php": "^7.2.5 || ^8.0",
-        "eftec/pdoone": "^4.3",
+        "eftec/clione": "^1.31",
+        "eftec/pdoone": "^4.3.3",
         "ext-pdo": "*",
         "ext-json": "*"
     },

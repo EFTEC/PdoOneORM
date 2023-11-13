@@ -14,12 +14,12 @@ use RuntimeException;
  * @package       eftec
  * @author        Jorge Castro Castillo
  * @copyright     Copyright Jorge Castro Castillo 2022-2023. Dual license, commercial and LGPL-3.0
- * @version       1.2.2
+ * @version       1.3.1
  */
 class PdoOneORM extends PdoOne
 {
     protected $phpstart = "<?php\n";
-    public const VERSION = '1.2.2';
+    public const VERSION = '1.3.1';
 
     /**
      * @param string $tableName

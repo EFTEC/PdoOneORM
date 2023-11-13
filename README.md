@@ -587,7 +587,12 @@ In a nutshell:
 > Every minor version means that it adds a new functionality i.e. 1.5 -> 1.6 (new methods)
 >
 > Every decimal version means that it patches/fixes/refactoring a previous functionality i.e. 1.5.0 -> 1.5.1 (fix)
-
+* 1.3.1 2023-11-13
+  * Update some templates
+  * It shows the table source when update() fails
+* 1.3 2023-09-02
+  * [PdoOneORMCli] 1.9 fixed a bug not scanning.
+  * Update composer.json dependency.
 * 1.2.2 2023-08-11
   * [PdoOneORMCli] 1.8.2 fixed a bug not scanning.
   * Update dependencies to eftec/pdoone 4.3

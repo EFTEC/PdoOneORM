@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection UnknownInspectionInspection */
 /** @noinspection PhpMultipleClassDeclarationsInspection */
 
 /** @noinspection SqlNoDataSourceInspection */
@@ -85,9 +85,9 @@ abstract class _BasePdoOneRepo
     /**
      * It returns a pdoOne instance (if any one). It also resets any stacked valued.
      * <br><b>Example</b>:<br>
-     * <pre>
+     * ```php
      * $values=self::base()->select('*')->from('table')->toList();
-     * </pre>
+     * ```
      *
      * @return PdoOne
      * @see _BasePdoOneRepo::getPdoOne
@@ -215,11 +215,11 @@ abstract class _BasePdoOneRepo
      * It runs a query and returns an array/value or false if error.<br>
      * This command does not stack with other operators (such as where(),sort(),etc.)<br>
      * <b>Example</b>:<br>
-     * <pre>
+     * ```php
      * $values=$con->query('select * from table where id=?',[20]'); // numeric argument
      * $values=$con->query('select * from table where id=:arg',['arg'=>20]); // named argument
      * $values=$con->query('select * from table where id=1'); // without argument
-     * </pre>
+     * ```
      *
      * @param string     $sql   The query to run
      * @param array|null $param [Optional] The arguments of the query.
@@ -265,9 +265,9 @@ abstract class _BasePdoOneRepo
      * With the recursive arrays, it gets all the classes related to the query (including this class) without the
      * namespace<br>
      * <b>Example:</b><br>
-     * <pre>
+     * ```php
      * CityRepo::recursive(['/countryFK'])::getRecursiveClass(); // ['CityRepo','TableFk']
-     * </pre>
+     * ```
      *
      * @param array|null $final  It is used internally for recursivity, it keeps the values.
      * @param string     $prefix It is used internally for recursivity.
@@ -459,7 +459,7 @@ abstract class _BasePdoOneRepo
      * It sets to use cache for the current pipelines. It is disabled at the end of the pipeline<br>
      * It only works if we set the cacheservice<br>
      * <b>Example</b><br>
-     * <pre>
+     * ```php
      * $this->setCacheService($instanceCache);
      * $this->useCache()->select() ...; // The cache never expires
      * $this->useCache(60)->select() ...; // The cache lasts 60 seconds.
@@ -471,7 +471,7 @@ abstract class _BasePdoOneRepo
      *                      // it could be invalidated by invalidateCache()
      * $this->useCache(60,'*')->select('col')
      *      ->from('table')->toList(); // '*' uses all the table assigned.
-     * </pre>
+     * ```
      *
      * @param null|bool|int $ttl        <b>null</b> then the cache never expires.<br>
      *                                  <b>false</b> then we don't use cache.<br>
@@ -513,10 +513,10 @@ abstract class _BasePdoOneRepo
     /**
      * It adds a "limit" in a query. It depends on the type of database<br>
      * <b>Example:</b><br>
-     * <pre>
+     * ```php
      *      ->select("")->limit("10,20")->toList(); // it reads from the row 10th and reads the next 20 rows
      *      ->select("")->limit(10,20)->toList(); // it reads from the row 10th and reads the next 20 rows
-     * </pre>
+     * ```
      *
      * @param mixed $first  The first value
      * @param mixed $second The second value
@@ -542,10 +542,10 @@ abstract class _BasePdoOneRepo
     /**
      * Add an inner join to the current table. You can nest many joins<br>
      * <b>Example:</b><br>
-     * <pre>
+     * ```php
      * CityRepo::innerjoin('country on city.country_id=country.country_id')->toList();
      * CityRepo::innerjoin('country','city.country_id=country.country_id')->toList();
-     * </pre>
+     * ```
      * @param string $sql The name of the table to join or the full query.
      * @param string $condition The condition (if it is not specified in the $sql)
      *
@@ -559,9 +559,9 @@ abstract class _BasePdoOneRepo
     /**
      * Add a left join to the current table. You can nest many joins<br>
      * <b>Example:</b><br>
-     * <pre>
+     * ```php
      * CityRepo::left('country on city.country_id=country.country_id')->toList();
-     * </pre>
+     * ```
      * @param string|null $sql The join expression.
      *
      * @return PdoOneQuery
@@ -574,9 +574,9 @@ abstract class _BasePdoOneRepo
     /**
      * Add a right join to the current table. You can nest many joins<br>
      * <b>Example:</b><br>
-     * <pre>
+     * ```php
      * CityRepo::right('country on city.country_id=country.country_id')->toList();
-     * </pre>
+     * ```
      * @param string|null $sql The join expression.
      *
      * @return PdoOneQuery
@@ -1280,12 +1280,12 @@ abstract class _BasePdoOneRepo
     /**
      * It gets the first value of a query<br>
      * <b>Example:</b><br>
-     * <pre>
+     * ```php
      * self::_first('2'); // select * from table where pk='2' (only returns the first value)
      * self::_first();  // select * from table (returns the first row if any)
      * self::where(['pk'=>'2'])::_first();  // select * from table where pk='2'
      * self::_first(['pk'=>'2']);  // select * from table where pk='2'
-     * </pre>
+     * ```
      *
      * @param mixed $pk If mixed. If null then it doesn't use the primary key to obtain data.
      *
@@ -1503,7 +1503,7 @@ abstract class _BasePdoOneRepo
             $pk = static::PK[0];
             if (!isset($entityDB[$pk])) {
                 $pkalias = @static::COL2ALIAS[static::PK[0]];
-                throw new RuntimeException("Update: Primary key [$pkalias] not set");
+                throw new RuntimeException("Update: Primary key [".static::TABLE."::$pkalias] not set");
             }
             self::recursiveDMLManyToOne('update', $entityAlias, $defs, $pdoOnequery, $recursiveBackup, $ns, $entityDB);
             self::recursiveDMLOxMMxM('update', $entityAlias, $defs, $pdoOnequery, $recursiveBackup, $ns, $entityDB[$pk]);
@@ -1759,11 +1759,11 @@ abstract class _BasePdoOneRepo
     /**
      * It invalidates a family/group of cache<br>
      * <b>Example</b>
-     * <pre>
+     * ```php
      * $list=CityRepo::useCache(50000,'city')->toList(); // using the cache
      * CityRepo::invalidateCache('city')->insert($city); // inserting a new value & flushing cache
      * $list=CityRepo::useCache(50000,'city')->toList(); // not using the cache
-     * </pre>
+     * ```
      *
      * @param string $family The family/grupo of cache(s) to invalidate. If empty or null, then it invalidates the
      *                       current table and all recursivity (if any)
@@ -1785,9 +1785,9 @@ abstract class _BasePdoOneRepo
     /**
      * It filters an associative array<br>
      * <b>Example:</b><br>
-     * <pre>
+     * ```php
      * self::intersectArraysNotNull(['a1'=>1,'a2'=>2],['a1','a3']); // ['a1'=>1]
-     * </pre>
+     * ```
      *
      * @param array $arrayValues An associative array with key as the column
      * @param array $arrayIndex  An indexed array with the name of the columns
@@ -1808,10 +1808,10 @@ abstract class _BasePdoOneRepo
 
     /**
      * Remove elements of an array unsing an array (indexed or not)<br>
-     * <pre>
+     * ```php
      * $this->diffArrays(['a'=>'aaa','b'=>'bbb'],['a'],false); // [b'=>'bbb']
      * $this->diffArrays(['a'=>'aaa','b'=>'bbb'],[0=>'a'],true); // [b'=>'bbb']
-     * </pre>
+     * ```
      *
      * @param      $arrayValues
      * @param      $arrayIndex
@@ -1837,10 +1837,10 @@ abstract class _BasePdoOneRepo
     /**
      * Merge two arrays only if the value of the second array is contained in the first array<br>
      * It works as masking. Example:<br>
-     * <pre>
+     * ```php
      * $this->intersectArrays(['a'=>'aaa','b'=>'bbb'],['a'],false); // ['a'=>'aaa']
      * $this->intersectArrays(['a'=>'aaa','b'=>'bbb'],[0=>'a'],true); // ['a'=>'aaa']
-     * </pre>
+     * ```
      *
      * @param array $arrayValues  An associative array with the keys and values.
      * @param array $arrayIndex   A string array with the indexes (if indexisKey=false then index is the value)
@@ -1867,26 +1867,26 @@ abstract class _BasePdoOneRepo
      * The fields recursives are marked with the prefix '/'.  For example 'customer' is a single field (column), while
      * '/customer' is a relation. Usually, a relation has both fields and relation.
      * - If the relation is manytoone, then the query is joined with the table indicated in the relation. Example:<br>
-     * <pre>
+     * ```php
      * ProductRepo::recursive(['/Category'])::toList(); // select ... from Producto inner join Category on ...
-     * </pre>
+     * ```
      * - If the relation is onetomany, then it creates an extra query (or queries) with the corresponding values.
      * Example:<br>
-     * <pre>
+     * ```php
      * CategoryRepo::recursive(['/Product'])::toList(); // select ... from Category and select from Product where...
-     * </pre>
+     * ```
      * - If the reation is onetoone, then it is considered as a manytoone, but it returns a single value. Example:<br>
-     * <pre>
+     * ```php
      * ProductRepo::recursive(['/ProductExtension'])::toList(); // select ... from Product inner join
      * ProductExtension
-     * </pre>
+     * ```
      * - If the relation is manytomany, then the system load the relational table (always, not matter the recursivity),
      * and it reads/insert/update the next values only if the value is marked as recursive. Example:<br>
-     * <pre>
+     * ```php
      * ProductRepo::recursive(['/product_x_category'])::toList(); // it returns porduct, productxcategory and
      * category ProductRepo::recursive([])->toList(); // it returns porduct and productxcategory (if
      * /productcategory is marked as manytomany)
-     * </pre>
+     * ```
      *
      *
      * @param array $recursive An indexed array with the recursivity.
