@@ -10,7 +10,7 @@
  * @noinspection SenselessProxyMethodInspection
  * @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection
  */
-{namespace}
+namespace {namespace};
 use eftec\PdoOne;
 {exception}
 // [EDIT:use] you can edit this part

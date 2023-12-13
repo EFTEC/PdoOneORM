@@ -587,6 +587,12 @@ In a nutshell:
 > Every minor version means that it adds a new functionality i.e. 1.5 -> 1.6 (new methods)
 >
 > Every decimal version means that it patches/fixes/refactoring a previous functionality i.e. 1.5.0 -> 1.5.1 (fix)
+
+* 2.0 2023-12-13
+  * Repo classes: Constant fields are now regular fields. 
+  * Why? Constants are a bit slow, but it also lacks of flexibility.
+  * Example: (prev) CustomerRepo::TABLE, (now) CustomerREPO::$TABLE
+  * Repositories classes must be regenerated.
 * 1.3.1 2023-11-13
   * Update some templates
   * It shows the table source when update() fails

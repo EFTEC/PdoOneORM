@@ -15,7 +15,7 @@
  * @noinspection SenselessProxyMethodInspection
  * @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection
  */
-{namespace}
+namespace {namespace};
 use eftec\PdoOne;
 use eftec\_BasePdoOneRepo;use eftec\PdoOneQuery;
 {exception}
@@ -42,7 +42,7 @@ class {class} extends _BasePdoOneRepo
 
 
     /** @var string[] it is used to set the relations betweeen table (key) and class (value) */
-    const RELATIONS = {relations};
+    public static $RELATIONS = {relations};
     /** @var PdoOne */
     public static $pdoOne;
     /** @var string|null $schema the current schema/database */
@@ -67,7 +67,7 @@ class {class} extends _BasePdoOneRepo
      * @return string[]
      */
     protected function tabletoClass(string $tableName) {
-        return static::RELATIONS[$tableName];
+        return static::$RELATIONS[$tableName];
     }
 
     /**
@@ -95,7 +95,8 @@ class {class} extends _BasePdoOneRepo
         }
         if (self::BINARYVERSION !== static::COMPILEDVERSION) {
             $p = new PdoOne('test', 'no database', '', '');
-            $p->throwError('Repository classes requires a new version. Please update PdoOne and rebuild'
+            $p->throwError('Repository classes ('.static::COMPILEDVERSION.') requires a new version '.
+                            '('.self::BINARYVERSION.'). Please update PdoOneORM and rebuild'
                 , self::class);
         }
 

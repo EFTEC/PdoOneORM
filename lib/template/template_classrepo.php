@@ -4,7 +4,7 @@
  * @noinspection UnknownInspectionInspection
  * @noinspection PhpUnused
  */
-{namespace}
+namespace {namespace};
 {modelnamespace}
 {exception}
 // [EDIT:use] you can edit this part
@@ -22,7 +22,7 @@
  */
 class {classname} extends Abstract{classname}
 {
-    const ME=__CLASS__;
+    public static $ME=__CLASS__;
     {modelclass}
     // [EDIT:content] you can edit this part
     // Here you can add your custom content.

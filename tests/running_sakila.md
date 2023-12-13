@@ -10,7 +10,7 @@ https://github.com/escuelainformatica/Sakila-Database-2021
 # then you must run (cli) this operator 
 
 ```shell
-php ../lib/pdoonecli generate --loadconfig .\sakila2021
+php ..\lib\pdooneorm --fileconnect sakila2021 --filerepo .\sakila2021orm  
 ```
 
 # Inside the GUI, you can scan for changes (scan)

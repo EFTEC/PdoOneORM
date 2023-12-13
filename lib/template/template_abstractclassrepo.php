@@ -1,7 +1,6 @@
 <?php http_response_code(404); die(1); // It is a template file, not a code to execute directly. This line is used to avoid to execute or read it. ?>
 /** @noinspection PhpUnusedParameterInspection
 * @noinspection PhpClassConstantAccessedViaChildClassInspection
-* @noinspection PhpClasspublic constantAccessedViaChildClassInspection
 * @noinspection NullCoalescingOperatorCanBeUsedInspection
 * @noinspection PhpPureAttributeCanBeAddedInspection
 * @noinspection PhpArrayShapeAttributeCanBeAddedInspection
@@ -20,7 +19,7 @@
 * @noinspection SenselessProxyMethodInspection
 * @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection
 */
-{namespace}
+namespace {namespace};
 use eftec\PdoOne;
 use eftec\PdoOneQuery;
 {modelnamespace}
@@ -37,12 +36,12 @@ use eftec\PdoOneQuery;
 */
 abstract class Abstract{classname} extends {baseclass}
 {
-    public const ENTITY = '{classname}';
-    public const TABLE = '{table}';
-    public const IDENTITY = {identity};
-    public const PK = {pk};
-    public const ME=__CLASS__;
-    public const EXTRACOLS='{extracol}';
+    public static $ENTITY = '{classname}';
+    public static $TABLE = '{table}';
+    public static $IDENTITY = {identity};
+    public static $PK = {pk};
+    public static $ME=__CLASS__;
+    public static $EXTRACOLS='{extracol}';
     /** @var string|null $schema you can set the current schema/database used by this class. [Default is null] */
     public static $schema;
 
@@ -162,7 +161,7 @@ abstract class Abstract{classname} extends {baseclass}
     */
     public static function where($sql, $param = PdoOne::NULL)
     {
-        return static::newQuery()->where($sql, $param,false,{classname}::TABLE);
+        return static::newQuery()->where($sql, $param,false,{classname}::$TABLE);
     }
 
     public static function getDefFK($structure=false) {

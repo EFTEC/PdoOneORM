@@ -12,11 +12,11 @@ use RuntimeException;
  * It is the CLI interface for PdoOne.<br>
  * <b>How to execute it?</b><br>
  * In the command line, runs the next line:<br>
- * <pre>
+ * ```
  * php vendor/eftec/PdoOne/lib/pdoonecli
  * or
  * vendor/bin/pdoonecli (Linux/macOS) / vendor/bin/pdoonecli.bat (Windows)
- * </pre>
+ * ```
  *
  * @see           https://github.com/EFTEC/PdoOneORM
  * @package       eftec
@@ -631,7 +631,7 @@ class PdoOneORMCli extends PdoOneCli
         // *** TABLEXCLASS
         if (count($this->tablexclass) !== 0) {
             foreach ($this->tablexclass as $table => $v) {
-                if (!isset($tablexclass[$table])) {
+                if(!isset($tablexclass[$table])) {
                     $this->cli->showCheck('<bold>deleted</bold>', 'red', "table <bold>$table</bold> deleted");
                     unset($this->tablexclass[$table], $this->columnsTable[$table], $this->extracolumn[$table]);
                 }
@@ -724,6 +724,19 @@ class PdoOneORMCli extends PdoOneCli
             }
         }
         $this->cli->downLevel();
+    }
+    protected function findIndexInArray($nameIndex,?array $array,bool $returnIndex) {
+        if($array===null) {
+            return null;
+        }
+        $nameIndex=strtolower($nameIndex);
+        foreach($array as $k=>$v) {
+            $s=strtolower($k);
+            if($s===$nameIndex) {
+                return ($returnIndex)?$k:$v;
+            }
+        }
+        return null;
     }
 
     public function createPdoInstance(): ?PdoOneORM

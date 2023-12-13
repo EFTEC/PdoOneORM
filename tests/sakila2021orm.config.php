@@ -37,6 +37,7 @@ $config=[
             'first_name' => 'first_name',
             'last_name' => 'last_name',
             'last_update' => 'last_update',
+            '_film_actor' => '_film_actor',
         ],
         'address' => [
             'address_id' => 'address_id',
@@ -66,12 +67,6 @@ $config=[
             '_country_id' => '_country_id',
             '_address' => '_address',
         ],
-        'clientes' => [
-            'id' => 'id',
-            'nombre' => 'nombre',
-            'apellido' => 'apellido',
-            'correo' => 'correo',
-        ],
         'country' => [
             'country_id' => 'country_id',
             'country' => 'country',
@@ -90,6 +85,7 @@ $config=[
             'last_update' => 'last_update',
             '_address_id' => '_address_id',
             '_store_id' => '_store_id',
+            '_payment' => '_payment',
             '_rental' => '_rental',
         ],
         'film' => [
@@ -106,11 +102,18 @@ $config=[
             'rating' => 'rating',
             'special_features' => 'special_features',
             'last_update' => 'last_update',
+            '_language_id' => '_language_id',
+            '_original_language_id' => '_original_language_id',
+            '_film_actor' => '_film_actor',
+            '_film_text' => '_film_text',
+            '_inventory' => '_inventory',
         ],
         'film_actor' => [
             'actor_id' => 'actor_id',
             'film_id' => 'film_id',
             'last_update' => 'last_update',
+            '_actor_id' => '_actor_id',
+            '_film_id' => '_film_id',
         ],
         'film_category' => [
             'film_id' => 'film_id',
@@ -122,18 +125,22 @@ $config=[
             'film_id' => 'film_id',
             'title' => 'title',
             'description' => 'description',
+            '_film_id' => '_film_id',
         ],
         'inventory' => [
             'inventory_id' => 'inventory_id',
             'film_id' => 'film_id',
             'store_id' => 'store_id',
             'last_update' => 'last_update',
+            '_film_id' => '_film_id',
+            '_store_id' => '_store_id',
             '_rental' => '_rental',
         ],
         'language' => [
             'language_id' => 'language_id',
             'name' => 'name',
             'last_update' => 'last_update',
+            '_film' => '_film',
         ],
         'payment' => [
             'payment_id' => 'payment_id',
@@ -143,6 +150,9 @@ $config=[
             'amount' => 'amount',
             'payment_date' => 'payment_date',
             'last_update' => 'last_update',
+            '_customer_id' => '_customer_id',
+            '_rental_id' => '_rental_id',
+            '_staff_id' => '_staff_id',
         ],
         'rental' => [
             'rental_id' => 'rental_id',
@@ -155,6 +165,7 @@ $config=[
             '_customer_id' => '_customer_id',
             '_inventory_id' => '_inventory_id',
             '_staff_id' => '_staff_id',
+            '_payment' => '_payment',
         ],
         'staff' => [
             'staff_id' => 'staff_id',
@@ -170,6 +181,7 @@ $config=[
             'last_update' => 'last_update',
             '_address_id' => '_address_id',
             '_store_id' => '_store_id',
+            '_payment' => '_payment',
             '_rental' => '_rental',
             '_store' => '_store',
         ],
@@ -181,7 +193,11 @@ $config=[
             '_address_id' => '_address_id',
             '_manager_staff_id' => '_manager_staff_id',
             '_customer' => '_customer',
+            '_inventory' => '_inventory',
             '_staff' => '_staff',
+        ],
+        'table1' => [
+            'id' => 'id',
         ],
     ],
     'columnsTable' => [
@@ -190,6 +206,7 @@ $config=[
             'first_name' => NULL,
             'last_name' => NULL,
             'last_update' => NULL,
+            '_film_actor' => 'ONETOMANY',
         ],
         'address' => [
             'address_id' => NULL,
@@ -219,12 +236,6 @@ $config=[
             '_country_id' => 'MANYTOONE',
             '_address' => 'ONETOMANY',
         ],
-        'clientes' => [
-            'id' => NULL,
-            'nombre' => NULL,
-            'apellido' => NULL,
-            'correo' => NULL,
-        ],
         'country' => [
             'country_id' => NULL,
             'country' => NULL,
@@ -243,6 +254,7 @@ $config=[
             'last_update' => NULL,
             '_address_id' => 'MANYTOONE',
             '_store_id' => 'MANYTOONE',
+            '_payment' => 'ONETOMANY',
             '_rental' => 'ONETOMANY',
         ],
         'film' => [
@@ -259,11 +271,18 @@ $config=[
             'rating' => NULL,
             'special_features' => NULL,
             'last_update' => NULL,
+            '_language_id' => 'MANYTOONE',
+            '_original_language_id' => 'MANYTOONE',
+            '_film_actor' => 'ONETOMANY',
+            '_film_text' => 'ONETOONE',
+            '_inventory' => 'ONETOMANY',
         ],
         'film_actor' => [
             'actor_id' => NULL,
             'film_id' => NULL,
             'last_update' => NULL,
+            '_actor_id' => 'ONETOONE',
+            '_film_id' => 'MANYTOONE',
         ],
         'film_category' => [
             'film_id' => NULL,
@@ -275,18 +294,22 @@ $config=[
             'film_id' => NULL,
             'title' => NULL,
             'description' => NULL,
+            '_film_id' => 'ONETOONE',
         ],
         'inventory' => [
             'inventory_id' => NULL,
             'film_id' => NULL,
             'store_id' => NULL,
             'last_update' => NULL,
+            '_film_id' => 'MANYTOONE',
+            '_store_id' => 'MANYTOONE',
             '_rental' => 'ONETOMANY',
         ],
         'language' => [
             'language_id' => NULL,
             'name' => NULL,
             'last_update' => NULL,
+            '_film' => 'ONETOMANY',
         ],
         'payment' => [
             'payment_id' => NULL,
@@ -296,6 +319,9 @@ $config=[
             'amount' => NULL,
             'payment_date' => NULL,
             'last_update' => NULL,
+            '_customer_id' => 'MANYTOONE',
+            '_rental_id' => 'MANYTOONE',
+            '_staff_id' => 'MANYTOONE',
         ],
         'rental' => [
             'rental_id' => NULL,
@@ -308,6 +334,7 @@ $config=[
             '_customer_id' => 'MANYTOONE',
             '_inventory_id' => 'MANYTOONE',
             '_staff_id' => 'MANYTOONE',
+            '_payment' => 'ONETOMANY',
         ],
         'staff' => [
             'staff_id' => NULL,
@@ -323,6 +350,7 @@ $config=[
             'last_update' => NULL,
             '_address_id' => 'MANYTOONE',
             '_store_id' => 'MANYTOONE',
+            '_payment' => 'ONETOMANY',
             '_rental' => 'ONETOMANY',
             '_store' => 'ONETOMANY',
         ],
@@ -334,7 +362,11 @@ $config=[
             '_address_id' => 'MANYTOONE',
             '_manager_staff_id' => 'MANYTOONE',
             '_customer' => 'ONETOMANY',
+            '_inventory' => 'ONETOMANY',
             '_staff' => 'ONETOMANY',
+        ],
+        'table1' => [
+            'id' => NULL,
         ],
     ],
     'extracolumn' => [
@@ -345,8 +377,6 @@ $config=[
         'category' => [
         ],
         'city' => [
-        ],
-        'clientes' => [
         ],
         'country' => [
         ],
@@ -372,13 +402,14 @@ $config=[
         ],
         'store' => [
         ],
+        'table1' => [
+        ],
     ],
     'tablexclass' => [
         'actor' => 'Actor',
         'address' => 'Addres',
         'category' => 'Category',
         'city' => 'City',
-        'clientes' => 'Client',
         'country' => 'Country',
         'customer' => 'Customer',
         'film' => 'Film',
@@ -391,14 +422,15 @@ $config=[
         'rental' => 'Rental',
         'staff' => 'Staff',
         'store' => 'Store',
+        'table1' => 'Table1',
     ],
     'removecolumn' => [
     ],
     'tablesmarked' => [
     ],
     'folder' => [
-        'classdirectory' => 'repo',
+        'classdirectory' => 'sakila2021',
         'classpostfix' => 'Repo',
-        'classnamespace' => 'eftec\\examples\\example1\\repo',
+        'classnamespace' => 'eftec\\tests\\sakila2021',
     ],
 ];

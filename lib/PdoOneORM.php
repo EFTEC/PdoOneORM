@@ -14,12 +14,12 @@ use RuntimeException;
  * @package       eftec
  * @author        Jorge Castro Castillo
  * @copyright     Copyright Jorge Castro Castillo 2022-2023. Dual license, commercial and LGPL-3.0
- * @version       1.3.1
+ * @version       2.0
  */
 class PdoOneORM extends PdoOne
 {
     protected $phpstart = "<?php\n";
-    public const VERSION = '1.3.1';
+    public const VERSION = '2.0';
 
     /**
      * @param string $tableName
@@ -78,7 +78,7 @@ class PdoOneORM extends PdoOne
             self::VERSION . ' Date generated ' . date('r'), //{version}
             $className, // {classname}
             ($namespace) ? 'use Exception;' : '',
-            ($namespace) ? "namespace $namespace;" : ''
+            ($namespace) ?: ''
         ], $r);
         $pk = '??';
         $pk = $this->service->getPK($tableName, $pk);
@@ -310,7 +310,7 @@ class PdoOneORM extends PdoOne
             self::VERSION . ' Date generated ' . date('r'), //{version}
             $className, // {classname}
             ($namespace) ? 'use Exception;' : '',
-            ($namespace) ? "namespace $namespace;" : ''
+            ($namespace) ?: ''
         ], $r);
         $pk = '??';
         $pk = $this->service->getPK($tableName, $pk);
@@ -541,8 +541,8 @@ class PdoOneORM extends PdoOne
 
     /**
      * It generates a class<br>
-     * <b>Example:</b><br>
-     * <pre>
+     * **Example:**
+     * ```php
      * $class = $this->generateCodeClass('tablename', 'namespace\namespace2'
      *          ,['_idchild2FK'=>'PARENT' // relation
      *          ,'_tablaparentxcategory'=>'MANYTOMANY' // relation
@@ -553,7 +553,7 @@ class PdoOneORM extends PdoOne
      * $class = $this->generateCodeClass(['ClassName'=>'tablename'], 'namespace\namespace2'
      *          ,['/idchild2FK'=>'PARENT','/tablaparentxcategory'=>'MANYTOMANY']
      *          ,'Repo');
-     * </pre>
+     * ```
      *
      * @param string|array  $tableName            The name of the table and the class.
      *                                            If the value is an array, then the key is the name of the table and
@@ -655,7 +655,7 @@ class PdoOneORM extends PdoOne
             $baseClass, // {baseclass}
             implode(",", $fa),
             $tableName, // {table}
-            ($namespace) ? "namespace $namespace;" : '', //{namespace}
+            ($namespace) ?: '', //{namespace}
             $modelUse ? "use $modelfullClass;" : '', // {modelnamespace}
             $modelUse ? "$modelClass::fromArrayMultiple( self::_toList(\$filter, \$filterValue));"
                 : 'false; // no model set',  // {classmodellist}
@@ -917,8 +917,8 @@ class PdoOneORM extends PdoOne
 
     /**
      * It builds (generates source code) of the base, repo and repoext classes of the current schema.<br>
-     * <b>Example:</b><br>
-     * <pre>
+     * **Example:**
+     * ```php
      * // with model
      * $this->generateAllClasses([
      *          'products'=>['ProductRepo','ProductModel']
@@ -947,7 +947,7 @@ class PdoOneORM extends PdoOne
      *          ['products'=>['_col'=>'PARENT','_col2'=>'MANYTOMANY'],
      *          ['products'=>['extracol'=>'now()']]
      *          ]);
-     * </pre>
+     * ```
      *
      * @param array        $relations       Where the key is the name of the table, and the value is an array with
      *                                      the name of the repository class and the name of the model class <br>
@@ -1187,7 +1187,7 @@ class PdoOneORM extends PdoOne
             $this->databaseType,
             $baseClassName,
             ($namespace) ? 'use Exception;' : '', // {exception}
-            ($namespace) ? "namespace $namespace;" : '', // {namespace}
+            ($namespace) ?: '', // {namespace}
             ($namespace) ? "$namespace\\\\" : '', // {namespace2}
             $this::varExport($classes),
             $modelUse ? 'true' : 'false', // {modeluse}
@@ -1256,7 +1256,7 @@ class PdoOneORM extends PdoOne
             ($namespace) ? 'use Exception;' : '',
             "'" . implode("','", $fa) . "'", // {args}
             $tableName, //{table}
-            ($namespace) ? "namespace $namespace;" : '', // {namespace}
+            ($namespace) ?: '', // {namespace}
             $modelfullClass ? "use $modelfullClass;" : '', // {modelnamespace}
             $modelClass ? "const MODEL= $modelClass::class;" : '', // {modelclass}
             $modelUse ? 'true' : 'false', // {modeluse},

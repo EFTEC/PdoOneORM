@@ -1,7 +1,6 @@
 <?php http_response_code(404); die(1); // It is a template file, not a code to execute directly. This line is used to avoid to execute or read it. ?>
 /** @noinspection PhpUnusedParameterInspection
 * @noinspection PhpClassConstantAccessedViaChildClassInspection
-* @noinspection PhpClasspublic constantAccessedViaChildClassInspection
 * @noinspection NullCoalescingOperatorCanBeUsedInspection
 * @noinspection PhpPureAttributeCanBeAddedInspection
 * @noinspection PhpArrayShapeAttributeCanBeAddedInspection
@@ -18,7 +17,7 @@
 * @noinspection SenselessProxyMethodInspection
 * @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection
 */
-{namespace}
+namespace {namespace};
 use eftec\PdoOne;
 use eftec\PdoOneQuery;
 {modelnamespace}
@@ -35,32 +34,32 @@ use eftec\PdoOneQuery;
  */
 abstract class Abstract{classname} extends {baseclass}
 {
-    public const ENTITY = '{classname}';
-    public const TABLE = '{table}';
+    public static $ENTITY = '{classname}';
+    public static $TABLE = '{table}';
     /** @var string A string with the name of the class. It is used to identify itself. */
-    public const IDENTITY = {identity};
+    public static $IDENTITY = {identity};
     /** @var string[] An indexed array with the original name of the primary keys. Note: Only the first primary key is used */
-    public const PK = {pk};
+    public static $PK = {pk};
     /** @var string A string with the name of the class. It is used to identify itself. */
-    public const ME=__CLASS__;
+    public static $ME=__CLASS__;
     /** @var string|null $schema you can set the current schema/database used by this class. [Default is null] */
     public static $schema;
 
     //<editor-fold desc="definitions">
-    public const EXTRACOLS='{extracol}';
+    public static $EXTRACOLS='{extracol}';
     /** @var string[][] an associative array with the definition of the columns */
-    public const DEF={def};
+    public static $DEF={def};
     /** @var string[][] an associative array with the definition of the foreign keys and relations */
-    public const DEFFK={deffktype};
-    public const DEFFKSQL={deffk};
+    public static $DEFFK={deffktype};
+    public static $DEFFKSQL={deffk};
     /** @var string[] An indexed array with the database name of the columns that are not inserted */
-    public const DEFNOINSERT={defnoinsert};
+    public static $DEFNOINSERT={defnoinsert};
     /** @var string[] An indexed array with the database name of the columns that are not updated */
-    public const DEFNOUPDATE={defnoupdate};
+    public static $DEFNOUPDATE={defnoupdate};
     /** @var string[] an associative array that associates the database column with its alias, ex: ['col'=>'colalias'] */
-    public const COL2ALIAS={defnamealias};
+    public static $COL2ALIAS={defnamealias};
     /** @var string[] an associative array that associates the alias with its database column, ex: ['colalias'=>'col'] */
-    public const ALIAS2COL={defnamealiasinv};
+    public static $ALIAS2COL={defnamealiasinv};
     //</editor-fold>
 
 
@@ -85,7 +84,7 @@ abstract class Abstract{classname} extends {baseclass}
     */
     public static function getDef(?string $column = null,?string $filter = null): array
     {
-        $r = self::DEF;
+        $r = self::$DEF;
         if ($column !== null) {
             if ($filter === null) {
                 foreach ($r as $k => $v) {
@@ -143,7 +142,7 @@ abstract class Abstract{classname} extends {baseclass}
     */
     public static function getDefName(bool $alias=false): array {
         if($alias) {
-            return static::COL2ALIAS;
+            return static::$COL2ALIAS;
         }
         return {defname};
     }
@@ -189,7 +188,7 @@ abstract class Abstract{classname} extends {baseclass}
     */
     public static function where($sql, $param = PdoOne::NULL): PdoOneQuery
     {
-        return static::newQuery()->where($sql, $param,false,{classname}::TABLE);
+        return static::newQuery()->where($sql, $param,false,{classname}::$TABLE);
     }
 
     /**

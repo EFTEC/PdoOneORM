@@ -20,8 +20,10 @@ use eftec\PdoOneORM;
 use eftec\tests\sakila2021\ActorRepo;
 use eftec\tests\sakila2021\ActorRepoRepo;
 use eftec\tests\sakila2021\CityRepo;
+use eftec\tests\sakila2021\CountryRepo;
 use eftec\tests\sakila2021\StaffRepo;
 use eftec\tests\sakila2021\StoreRepo;
+use eftec\tests\sakila2021\Table1Repo;
 use Exception;
 use PHPUnit\Framework\TestCase;
 
@@ -135,7 +137,8 @@ class PdoOne_mysql_sakila2021_Test extends TestCase
     public function testError(): void
     {
         $cr = CityRepo::factory();
-        $this->assertEquals(false, CityRepo::setFalseOnError()->insert($cr));
+
+        $this->assertFalse(CityRepo::setFalseOnError()->insert($cr));
         $this->assertEquals('', CityRepo::base()->lastError());
         $this->assertNotEquals('', CityRepo::base()->errorText);
     }
@@ -143,6 +146,15 @@ class PdoOne_mysql_sakila2021_Test extends TestCase
     public function testList(): void
     {
         $this->assertCount(7, StoreRepo::toList());
+    }
+    public function testOther():void
+    {
+        $this->assertTrue(Table1Repo::dropTable());
+
+        $this->assertTrue(Table1Repo::createTable());
+        $this->assertTrue(Table1Repo::truncate(true));
+        $this->assertTrue(Table1Repo::deleteAll());
+
     }
 
     public function testFirst(): void
@@ -368,15 +380,15 @@ class PdoOne_mysql_sakila2021_Test extends TestCase
     public function testValida():void
     {
         $a1=ActorRepo::factory();
-        $this->assertEquals(false,ActorRepo::validateModel($a1));
+        $this->assertFalse(ActorRepo::validateModel($a1));
         $this->assertEquals('field actor_id must not be null',ActorRepo::base()->errorText);
         $a1['actor_id']=22;
-        $this->assertEquals(false,ActorRepo::validateModel($a1));
+        $this->assertFalse(ActorRepo::validateModel($a1));
         $this->assertEquals('field first_name is not a string',ActorRepo::base()->errorText);
         $a1['first_name']='john';
         $a1['last_name']='doe';
         $a1['last_update']='2020-01-01';
-        $this->assertEquals(true,ActorRepo::validateModel($a1));
+        $this->assertTrue(ActorRepo::validateModel($a1));
         $this->assertEquals('',ActorRepo::base()->errorText);
 
     }
