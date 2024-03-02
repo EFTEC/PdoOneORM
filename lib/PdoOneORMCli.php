@@ -4,6 +4,7 @@
 
 namespace eftec;
 
+use eftec\CliOne\CliOneParam;
 use Exception;
 use RuntimeException;
 
@@ -22,45 +23,45 @@ use RuntimeException;
  * @package       eftec
  * @author        Jorge Castro Castillo
  * @copyright     Copyright Jorge Castro Castillo 2022-2023. Dual license, commercial and LGPL-3.0
- * @version       1.9
+ * @version       1.10
  */
 class PdoOneORMCli extends PdoOneCli
 {
     /**
      * @var array
      */
-    protected $tablexclass = [];
+    protected array $tablexclass = [];
     /**
      * @var array conversion by type
      */
-    protected $conversion = ["bigint" => null, "blob" => null, "char" => null, "date" => null, "datetime" => null,
+    protected array $conversion = ["bigint" => null, "blob" => null, "char" => null, "date" => null, "datetime" => null,
         "decimal" => null, "double" => null, "enum" => null, "float" => null, "geometry" => null,
         "int" => null, "json" => null, "longblob" => null, "mediumint" => null, "mediumtext" => null,
         "set" => null, "smallint" => null, "text" => null, "time" => null, "timestamp" => null,
         "tinyint" => null, "varbinary" => null, "varchar" => null, "year" => null];
-    protected $folder = [];
+    protected array $folder = [];
     /**
      * @var array
      */
-    protected $alias = [];
+    protected array $alias = [];
     /**
      * @var array
      */
-    protected $extracolumn = [];
+    protected array $extracolumn = [];
     /**
      * @var array
      */
-    protected $removecolumn = [];
+    protected array $removecolumn = [];
     /**
      * @var array
      */
-    protected $columnsTable = [];
+    protected array $columnsTable = [];
     /**
      * @var array
      */
-    protected $columnsAlias = [];
-    protected $tablesmarked = [];
-    private $classesSelected;
+    protected array $columnsAlias = [];
+    protected array $tablesmarked = [];
+    private ?CliOneParam $classesSelected=null;
 
     public function __construct(bool $run = true)
     {

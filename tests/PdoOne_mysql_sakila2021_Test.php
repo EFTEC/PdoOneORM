@@ -20,7 +20,7 @@ use eftec\PdoOneORM;
 use eftec\tests\sakila2021\ActorRepo;
 use eftec\tests\sakila2021\ActorRepoRepo;
 use eftec\tests\sakila2021\CityRepo;
-use eftec\tests\sakila2021\CountryRepo;
+//use eftec\tests\sakila2021\CountryRepo;
 use eftec\tests\sakila2021\StaffRepo;
 use eftec\tests\sakila2021\StoreRepo;
 use eftec\tests\sakila2021\Table1Repo;
@@ -36,9 +36,9 @@ use PHPUnit\Framework\TestCase;
 // it is an example of a CacheService
 class CacheServicesmysql implements IPdoOneCache
 {
-    public $cacheData = [];
-    public $cacheDataFamily = [];
-    public $cacheCounter = 0; // for debug
+    public array $cacheData = [];
+    public array $cacheDataFamily = [];
+    public int $cacheCounter = 0; // for debug
 
     public function getCache($uid, $family = '')
     {
@@ -112,7 +112,7 @@ class CacheServicesmysql implements IPdoOneCache
 class PdoOne_mysql_sakila2021_Test extends TestCase
 {
     /** @var PdoOneORM */
-    protected $pdoOne;
+    protected PdoOneORM $pdoOne;
 
     public function test_genCode(): void
     {

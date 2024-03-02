@@ -4,6 +4,7 @@
 namespace eftec;
 
 use Exception;
+use JsonException;
 use RuntimeException;
 
 /**
@@ -14,12 +15,12 @@ use RuntimeException;
  * @package       eftec
  * @author        Jorge Castro Castillo
  * @copyright     Copyright Jorge Castro Castillo 2022-2023. Dual license, commercial and LGPL-3.0
- * @version       2.0
+ * @version       2.1
  */
 class PdoOneORM extends PdoOne
 {
-    protected $phpstart = "<?php\n";
-    public const VERSION = '2.0';
+    protected string $phpstart = "<?php\n";
+    public const VERSION = '2.1';
 
     /**
      * @param string $tableName
@@ -217,7 +218,7 @@ class PdoOneORM extends PdoOne
         } else {
             $noInsert = $identities;
         }
-        if ($defNoInsert !== null) {
+        if ($defNoUpdate !== null) {
             $noUpdate = array_merge($identities, $defNoUpdate);
         } else {
             $noUpdate = $identities;
@@ -495,7 +496,7 @@ class PdoOneORM extends PdoOne
         } else {
             $noInsert = $identities;
         }
-        if ($defNoInsert !== null) {
+        if ($defNoUpdate !== null) {
             $noUpdate = array_merge($identities, $defNoUpdate);
         } else {
             $noUpdate = $identities;
@@ -987,6 +988,7 @@ class PdoOneORM extends PdoOne
      * @param array        $aliases         An associative array with the alias of every column.<br>
      *                                      If this array is empty, then it keeps the current value
      * @return array It returns an array with all the errors or warnings (if any).
+     * @throws JsonException
      * @see PdoOne::generateCodeClassConversions
      */
     public function generateAllClasses(
@@ -1071,7 +1073,7 @@ class PdoOneORM extends PdoOne
             }
             if ($result === false) {
                 $logs[] = "Unable to save Repo Abstract Class file '{$folder}Abstract$className.php' "
-                    . json_encode(error_get_last());
+                    . json_encode(error_get_last(), JSON_THROW_ON_ERROR);
             }
             // creating model
             $resultcolumns = [];
@@ -1085,7 +1087,7 @@ class PdoOneORM extends PdoOne
             }
             if ($result === false) {
                 $logs[] = "Error: Unable to save Abstract Model Class file '{$folder}Abstract"
-                    . $relationsModel[$tableName] . ".php' " . json_encode(error_get_last());
+                    . $relationsModel[$tableName] . ".php' " . json_encode(error_get_last(), JSON_THROW_ON_ERROR);
             }
             if ($useModel) {
                 try {
@@ -1097,7 +1099,7 @@ class PdoOneORM extends PdoOne
                 }
                 if ($result === false) {
                     $logs[] = "Error: Unable to save Abstract Model Class file '{$folder}Abstract"
-                        . $relationsModel[$tableName] . ".php' " . json_encode(error_get_last());
+                        . $relationsModel[$tableName] . ".php' " . json_encode(error_get_last(), JSON_THROW_ON_ERROR);
                 }
                 try {
                     $filename = $folderModel . $relationsModel[$tableName] . '.php';
@@ -1112,7 +1114,7 @@ class PdoOneORM extends PdoOne
                     $result = false;
                 }
                 if ($result === false) {
-                    $logs[] = "Error: Unable to save Model Class file '$filename' " . json_encode(error_get_last());
+                    $logs[] = "Error: Unable to save Model Class file '$filename' " . json_encode(error_get_last(), JSON_THROW_ON_ERROR);
                 }
             }
             try {
@@ -1134,7 +1136,7 @@ class PdoOneORM extends PdoOne
                 $result = false;
             }
             if ($result === false) {
-                $logs[] = "Error: Unable to save Repo Class file '$folder$className.php' " . json_encode(error_get_last());
+                $logs[] = "Error: Unable to save Repo Class file '$folder$className.php' " . json_encode(error_get_last(), JSON_THROW_ON_ERROR);
             }
         }
         $this->setUseInternalCache($internalCache);

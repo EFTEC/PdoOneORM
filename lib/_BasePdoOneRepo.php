@@ -6,6 +6,7 @@
 namespace eftec;
 
 use Exception;
+use JsonException;
 use PDOStatement;
 use RuntimeException;
 
@@ -674,6 +675,7 @@ abstract class _BasePdoOneRepo
      * @param bool        $first        if true then it only returns the first value (not as an array). It is used by
      *                                  first()
      * @return array
+     * @throws JsonException
      */
     public static function executePlan0(PdoOneQuery $currentQuery, ?array $conditions = null, bool $first = false)
     {
@@ -718,6 +720,7 @@ abstract class _BasePdoOneRepo
      * @param array|null  $dependency     The current depdendency
      * @param bool        $first          if true, then it only gets the first value.
      * @return array|false|mixed
+     * @throws JsonException
      */
     public static function executePlan(PdoOneQuery $currentQuery, string $absolutePrefix, ?array $conditions = null, ?array $dependency = [], bool $first = false)
     {
@@ -761,7 +764,7 @@ abstract class _BasePdoOneRepo
                 return false;
             }
             static::getPdoOne()
-                ->throwError("PdoOne: Error in $first", json_encode($conditions), '', true, $exception);
+                ->throwError("PdoOne: Error in $first", json_encode($conditions, JSON_THROW_ON_ERROR), '', true, $exception);
             return false;
         }
     }
@@ -811,6 +814,14 @@ abstract class _BasePdoOneRepo
         }
     }
 
+    /**
+     * @param string $absolutePrefix
+     * @param array  $dependency
+     * @param array  $relation
+     * @param        $value
+     * @return array
+     * @throws JsonException
+     */
     public static function planManyToMany(string $absolutePrefix, array $dependency, array $relation, $value): array
     {
         $where = [substr($relation['refcol'], 1) => $value];
@@ -827,6 +838,16 @@ abstract class _BasePdoOneRepo
         }
         return $rowFinal;
     }
+
+    /**
+     * An internal function to "one to many" relation
+     * @param string $absolutePrefix
+     * @param array  $dependency
+     * @param array  $relation
+     * @param        $value
+     * @return array
+     * @throws JsonException
+     */
 
     public static function planOneToMany(string $absolutePrefix, array $dependency, array $relation, $value): array
     {
@@ -1394,6 +1415,11 @@ abstract class _BasePdoOneRepo
         return static::_insert($entity, $transaction, $newQuery);
     }
 
+    /**
+     * @param mixed $entityAlias
+     * @return bool
+     * @throws JsonException
+     */
     protected static function _exist($entityAlias): bool
     {
         try {
@@ -1403,7 +1429,7 @@ abstract class _BasePdoOneRepo
             }
             if (!is_array($pks) || count($pks) === 0) {
                 static::getPdoOne()
-                    ->throwError('exist: entity not specified as an array or the table lacks a PK', json_encode($entityAlias));
+                    ->throwError('exist: entity not specified as an array or the table lacks a PK', json_encode($entityAlias, JSON_THROW_ON_ERROR));
                 return false;
             }
             if (is_array($entityAlias)) {
@@ -1433,7 +1459,7 @@ abstract class _BasePdoOneRepo
                 return false;
             }
             static::getPdoOne()
-                ->throwError('', json_encode($entityAlias), '', true, $exception);
+                ->throwError('', json_encode($entityAlias, JSON_THROW_ON_ERROR), '', true, $exception);
         }
         self::reset();
         return false;
